@@ -1,0 +1,14 @@
+syntax = "proto2";
+package config_req;
+
+message User {
+  optional uint32 id = 1;
+  optional uint32 uid = 2;
+  optional string username = 3;
+  optional string pass = 4;
+  optional string level = 5;
+  optional string comment = 6;
+  optional string disabled = 7;
+  optional uint32 lockedtime = 8;
+  optional string resource = 9;
+}

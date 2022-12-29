@@ -1,0 +1,5 @@
+#ignore files below which is not necessary for server deployment
+*.so
+*.o
+*.pb.cc
+*.swp

@@ -1,0 +1,115 @@
+syntax = "proto2";
+package config_req;
+
+message Event {
+  optional uint32 event_id = 1;
+  optional string desc = 2;
+  optional string event_type = 3;
+  optional string event_level = 4;
+  optional string status = 5;
+  optional string action_id = 6;
+  optional uint32 config_id = 7;
+
+  optional uint32 type_id = 8;
+  optional uint32 level_id = 9;
+  optional uint32 status_id = 10;
+  optional string devid = 11;
+  optional string moid = 12;
+
+  optional string weekday = 13;
+  optional string stime = 14;
+  optional string etime = 15;
+  optional string coverrange = 16;
+}
+
+message EventIgnore {
+  optional uint32 id = 1;
+  optional uint32 time = 2;
+  optional string lip = 3;
+  optional string tip = 4;
+  optional string tport = 5;
+  optional string protocol = 6;
+  required string desc = 7;
+  optional string weekday = 8;
+  optional string stime = 9;
+  optional string etime = 10;
+  optional string coverrange = 11;
+  optional uint32 count = 12;
+  optional string domain = 13;
+}
+
+message EventConfig {
+  optional uint32 id = 1;
+  optional uint32 moid = 2;
+  optional string thres_mode = 3;
+  optional string data_type = 4;
+  optional string min = 5;
+  optional string max = 6;
+  optional string grep_rule = 7;
+  optional uint32 min_peerips = 8;
+  optional string max_peerips = 9;
+  optional uint32 min_portsessions = 10;
+  optional string max_portsessions = 11;
+  optional string ip = 12;
+  optional string port = 13;
+  optional string protocol = 14;
+  optional uint32 namelen = 15;
+  optional uint32 fqcount = 16;
+  optional uint32 detvalue = 17;
+  optional string desc = 18;
+  optional uint32 qcount = 19;
+  optional string qname = 20;
+  optional string sip = 21;
+  optional string dip = 22;
+  optional uint32 min_peerports = 23;
+  optional string max_peerports = 24;
+  optional string pat = 25;
+  optional uint32 url_type = 26;
+  optional uint32 IF1 = 27;
+  optional uint32 IF2 = 28;
+  optional uint32 IF3 = 29;
+}
+
+message EventAction {
+  optional uint32 action_id = 1;
+  optional uint32 act = 2;
+  optional string mail = 3;
+  optional string phone = 4;
+  optional string uid = 5;
+  optional string desc = 6;
+}
+
+message EventType {
+  optional uint32 id = 1;
+  optional string desc = 2;
+}
+
+message EventUrlType {
+  optional uint32 id = 1;
+  optional string desc = 2;
+}
+
+message EventLevel {
+  optional uint32 id = 1;
+  optional string desc = 2;
+  optional string profile = 3;
+}
+
+message EventDataAggre {
+  optional uint32 starttime = 1;
+  optional uint32 endtime = 2;
+  optional uint32 step = 3;
+  optional string type = 4;
+  optional uint32 devid = 5;
+  optional uint32 event_id = 6;
+  optional uint32 id = 7;
+  optional string obj = 8;
+  optional string level = 9;
+}
+
+/*message EventConfigDns {
+  optional uint32 id = 1;
+  optional string host = 2;
+  optional string namelist = 3;
+  optional string threatscore = 4;
+}*/

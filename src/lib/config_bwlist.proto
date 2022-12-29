@@ -1,0 +1,11 @@
+syntax = "proto2";
+package config_req;
+
+message Bwlist {
+  optional string target = 1;
+  optional uint32 id = 2;
+  optional uint32 time = 3;
+  optional string ip = 4;
+  optional string port = 5;
+  optional string desc = 6;
+}

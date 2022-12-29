@@ -1,0 +1,20 @@
+#ignore files below which is not necessary for server deployment
+*.o
+*.swp
+topn
+config_pusher
+mo
+geoip
+internalip
+gen_event
+event
+config
+auth
+locinfo
+geoinfo
+portinfo
+bwlist
+threatinfo
+gen_dns_event
+threatinfopro
+feature
