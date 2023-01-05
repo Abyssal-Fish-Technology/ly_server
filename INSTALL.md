@@ -21,16 +21,16 @@
 	yum install python-setuptools -y	
 	 
 3. 安装管理引擎
-	# 下载主程序部署包 ly_server_release.v1.0.0.221226.tar.gz，并解压文件
-	tar -xzvf ly_server_release.v1.0.0.221226.tar.gz
+	# 下载主程序部署包 ly_server_release.v1.0.0.221229.tar.gz，并解压文件
+	tar -xzvf ly_server_release.v1.0.0.221229.tar.gz
 	
-	# 下载所附依赖环境包 ly_server_dependence.v1.0.0.221226.tar.gz
+	# 下载所附依赖环境包 ly_server_dependence.v1.0.0.221229.tar.gz
 	# 解压后置于上述解压缩后生成的目录中
-	tar -xzvf ly_server_dependence.v1.0.0.221226.tar.gz
-	mv ly_server_dependence.v1.0.0.221226/*  ly_server_release.v1.0.0.221226/
+	tar -xzvf ly_server_dependence.v1.0.0.221229.tar.gz
+	mv ly_server_dependence.v1.0.0.221229/*  ly_server_release.v1.0.0.221229/
 
 	# 进入程序目录，执行部署脚本
-	cd ly_server_release.v1.0.0.221226
+	cd ly_server_release.v1.0.0.221229
 	./server_deploy_new.sh
 ```
 
