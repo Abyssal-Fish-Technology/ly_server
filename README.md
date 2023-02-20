@@ -129,7 +129,7 @@ protobuf-3.8.0
 9. 配置httpd
    # 编辑/etc/httpd/conf.d/server.conf
    Listen 18080
-   <VirtualHost :18080>
+   <VirtualHost *:18080>
       DocumentRoot "/Server/www"
       AddDefaultCharset utf-8
       <Directory "/Server/www">
@@ -150,7 +150,7 @@ protobuf-3.8.0
           Require all granted
           RewriteEngine On
           RewriteCond %{REQUEST_FILENAME} !auth$
-          RewriteRule ^(.)$ auth?auth_target=$1 [QSA,PT,L]
+          RewriteRule ^(.*)$ auth?auth_target=$1 [QSA,PT,L]
       </Directory>
    </VirtualHost>
    
