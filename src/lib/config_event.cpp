@@ -4296,7 +4296,7 @@ bool ConfigEvent::ParseReqForConfigThreshold(cgicc::Cgicc& cgi){
 	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
 	if (!cgi("moid").empty()) req->set_moid( atol(cgi("moid").c_str()) );
 	if (!cgi("thres_mode").empty()) req->set_thres_mode( boost::to_lower_copy(cgi("thres_mode")) );
-	if (!cgi("data_type").empty()) req->set_data_type( boost::to_lower_copy(cgi("data_type")) );
+	if (!cgi("data_type").empty()) req->set_data_type( cgi("data_type") );
 	if (!cgi("min").empty()) req->set_min( cgi("min")=="null"?"":cgi("min") );
 	if (!cgi("max").empty()) req->set_max( cgi("max")=="null"?"":cgi("max") );
 	if (!cgi("grep_rule").empty()) req->set_grep_rule( cgi("grep_rule")=="null"?"":cgi("grep_rule") );
@@ -4309,7 +4309,7 @@ bool ConfigEvent::ParseReqForConfigBlack(cgicc::Cgicc& cgi){
 	this->_req = req;
 
 	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("data_type").empty()) req->set_data_type( boost::to_lower_copy(cgi("data_type")) );
+	if (!cgi("data_type").empty()) req->set_data_type( cgi("data_type") );
 	if (!cgi("min").empty()) req->set_min( cgi("min") );
 	if (!cgi("max").empty()) req->set_max( cgi("max")=="null"?"":cgi("max") );
 
@@ -4321,7 +4321,7 @@ bool ConfigEvent::ParseReqForConfigSus(cgicc::Cgicc& cgi){
 	this->_req = req;
 
 	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("data_type").empty()) req->set_data_type( boost::to_lower_copy(cgi("data_type")) );
+	if (!cgi("data_type").empty()) req->set_data_type( cgi("data_type") );
 	if (!cgi("min").empty()) req->set_min( cgi("min") );
 	if (!cgi("max").empty()) req->set_max( cgi("max")=="null"?"":cgi("max") );
 
@@ -4667,7 +4667,7 @@ bool ConfigEvent::ValidateConfigThreshold(){
 				return Failed();
 			if ( req->thres_mode()!="abs" && req->thres_mode()!="rel_v" && req->thres_mode()!="rel_p" )
 				return Failed();
-			if ( req->data_type()!="bps" && req->data_type()!="pps" && req->data_type()!="sps" )
+			if ( req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
 				return Failed();
 			if ( !req->has_moid() )
 				req->set_moid(0);
@@ -4683,7 +4683,7 @@ bool ConfigEvent::ValidateConfigThreshold(){
 				return Failed();
 			if ( req->has_thres_mode() && req->thres_mode()!="abs" && req->thres_mode()!="rel_v" && req->thres_mode()!="rel_p" )
 				return Failed();
-			if ( req->has_data_type() && req->data_type()!="bps" && req->data_type()!="pps" && req->data_type()!="sps" )
+			if ( req->has_data_type() && req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
 				return Failed();
 			break;
 		case GET:
@@ -4805,7 +4805,7 @@ bool ConfigEvent::ValidateConfigBlack(){
 		case ADD:
       if ( req->data_type().empty() )
         return Failed();
-			if ( req->data_type()!="bps" && req->data_type()!="pps" && req->data_type()!="sps" )
+			if ( req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
 				return Failed();
 			if ( !req->has_min() )
 				return Failed();
@@ -4819,7 +4819,7 @@ bool ConfigEvent::ValidateConfigBlack(){
 				return Failed();
 			if ( !req->has_min() && !req->has_max() && req->data_type().empty() ) 
 				return Failed();
-      if ( req->has_data_type() && req->data_type()!="bps" && req->data_type()!="pps" && req->data_type()!="sps" )
+      if ( req->has_data_type() && req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
         return Failed();
 			break;
 		case GET:
@@ -4839,7 +4839,7 @@ bool ConfigEvent::ValidateConfigSus(){
 		case ADD:
       if ( req->data_type().empty() )
         return Failed();
-			if ( req->data_type()!="bps" && req->data_type()!="pps" && req->data_type()!="sps" )
+			if ( req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
 				return Failed();
 			if ( !req->has_min() )
 				return Failed();
@@ -4853,7 +4853,7 @@ bool ConfigEvent::ValidateConfigSus(){
 				return Failed();
 			if ( !req->has_min() && !req->has_max() && req->data_type().empty() ) 
 				return Failed();
-      if ( req->has_data_type() && req->data_type()!="bps" && req->data_type()!="pps" && req->data_type()!="sps" )
+      if ( req->has_data_type() && req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
         return Failed();
 			break;
 		case GET:
