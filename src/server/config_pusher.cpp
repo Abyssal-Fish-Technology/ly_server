@@ -20,6 +20,11 @@ static int debug = 0;
 
 ////////////////////////////////////////////////////////////////////////////
 static void construct_cfg_mo(Config& common_cfg, map<u32,Config>& cfg, const map<u32,u32>& dev_to_agent){
+  if (!dev_to_agent.size()) {
+    log_info("No matched dev and agent.\n");
+    return;
+  }  
+
   map<u32, policy::PolicyIndex * > agent_pi;
   PolicyIndex common_pi;
 
@@ -54,6 +59,7 @@ static void construct_cfg_mo(Config& common_cfg, map<u32,Config>& cfg, const map
         }
         catch (const std::out_of_range& oor) {
           log_err("%d: Out of range for dev_to_agent.at(%u)\n", __LINE__, u);
+          continue;
         }
       }
       else {
@@ -91,7 +97,7 @@ static void construct_cfg_mo(Config& common_cfg, map<u32,Config>& cfg, const map
 
       r>>s;
       mo->set_filter(s);
-		
+    
       r>>s;
       mo->set_direction(s);
 
@@ -164,6 +170,11 @@ static inline void set_coverrange(Event *e, const string& coverrange) {
 
 ////////////////////////////////////////////////////////////////////////////
 static inline void construct_event_config(Config& common_cfg, map<u32,Config>& cfg, const map<u32,u32>& dev_to_agent){
+  if (!dev_to_agent.size()) {
+    log_info("No matched dev and agent.\n");
+    return;
+  }
+
   u32 id, moid, min, max, min_peerips, max_peerips, min_peerports, max_peerports, min_portsessions, max_portsessions;
   u32 if1, if2, if3;
   string thres_mode, data_type, grep_rule;
@@ -358,27 +369,27 @@ static inline void construct_event_config(Config& common_cfg, map<u32,Config>& c
     return;
   }
 
-	try {
-		res = *sql << "SELECT t1.`id`, t2.`devid`, `data_type`, `min`, `max`, t2.`weekday`, t2.`stime`, t2.`etime`, t2.`coverrange` "
-			" FROM `t_event_config_sus` t1, `t_event_list` t2, `t_event_status` t3"
-			" WHERE t1.`id`=t2.`config_id` AND t2.`type_id`=6 AND t2.`status_id`=t3.`id` AND t3.`status`='ON' "; 
-	
-		while(res.next()) {
-			res>>id>>cppdb::into(devid, devid_nullTag)>>data_type>>min>>cppdb::into(max, nullTag);
-    	  res>>weekday>>stime>>etime>>coverrange;
-      	if (devid_nullTag==cppdb::null_value)
-        	p = common_cfg.add_event();
-      	else
-      	{
-        	try{
-          	p = cfg[dev_to_agent.at(devid)].add_event();
-          	p->set_devid(devid);
-        	}catch (const std::out_of_range& oor) {
-          	continue;
-        	}
-      	}
+  try {
+    res = *sql << "SELECT t1.`id`, t2.`devid`, `data_type`, `min`, `max`, t2.`weekday`, t2.`stime`, t2.`etime`, t2.`coverrange` "
+      " FROM `t_event_config_sus` t1, `t_event_list` t2, `t_event_status` t3"
+      " WHERE t1.`id`=t2.`config_id` AND t2.`type_id`=6 AND t2.`status_id`=t3.`id` AND t3.`status`='ON' "; 
+  
+    while(res.next()) {
+      res>>id>>cppdb::into(devid, devid_nullTag)>>data_type>>min>>cppdb::into(max, nullTag);
+        res>>weekday>>stime>>etime>>coverrange;
+        if (devid_nullTag==cppdb::null_value)
+          p = common_cfg.add_event();
+        else
+        {
+          try{
+            p = cfg[dev_to_agent.at(devid)].add_event();
+            p->set_devid(devid);
+          }catch (const std::out_of_range& oor) {
+            continue;
+          }
+        }
 
-    	p->set_type_id(6);
+      p->set_type_id(6);
       p->set_config_id(id);
       p->set_data_type(data_type);
       p->set_min(min);
@@ -390,29 +401,29 @@ static inline void construct_event_config(Config& common_cfg, map<u32,Config>& c
       set_etime(p, etime);
       set_coverrange(p, coverrange);
     }
-	} catch (std::exception const &e) {
-		log_err("%d: construct_event_config(): t_event_config_sus: %s", __LINE__, e.what());
+  } catch (std::exception const &e) {
+    log_err("%d: construct_event_config(): t_event_config_sus: %s", __LINE__, e.what());
     return;
-	}
-	try {
+  }
+  try {
     res = *sql << "SELECT t1.`id`, t2.`devid`, `data_type`, `min`, `max`, t2.`weekday`, t2.`stime`, t2.`etime`, t2.`coverrange` "
       " FROM `t_event_config_black` t1, `t_event_list` t2, `t_event_status` t3"
       " WHERE t1.`id`=t2.`config_id` AND t2.`type_id`=5 AND t2.`status_id`=t3.`id` AND t3.`status`='ON' ";
   
-  	while(res.next()) {
-    	res>>id>>cppdb::into(devid, devid_nullTag)>>data_type>>min>>cppdb::into(max, nullTag);
-      	res>>weekday>>stime>>etime>>coverrange;
-      	if (devid_nullTag==cppdb::null_value)
-        	p = common_cfg.add_event();
-      	else
-      	{
-        	try{
-          	p = cfg[dev_to_agent.at(devid)].add_event();
-          	p->set_devid(devid);
-        	}catch (const std::out_of_range& oor) {
-          	continue;
-        	}
-      	}
+    while(res.next()) {
+      res>>id>>cppdb::into(devid, devid_nullTag)>>data_type>>min>>cppdb::into(max, nullTag);
+        res>>weekday>>stime>>etime>>coverrange;
+        if (devid_nullTag==cppdb::null_value)
+          p = common_cfg.add_event();
+        else
+        {
+          try{
+            p = cfg[dev_to_agent.at(devid)].add_event();
+            p->set_devid(devid);
+          }catch (const std::out_of_range& oor) {
+            continue;
+          }
+        }
 
       p->set_type_id(5);
       p->set_config_id(id);
@@ -430,25 +441,25 @@ static inline void construct_event_config(Config& common_cfg, map<u32,Config>& c
     log_err("%d: construct_event_config(): t_event_config_black: %s", __LINE__, e.what());
     return;
   }
-	try {
+  try {
     res = *sql << "SELECT t1.`id`, t2.`devid`, `ip`, `qname`, `qcount`, t2.`weekday`, t2.`stime`, t2.`etime`, t2.`coverrange` "
       " FROM `t_event_config_dns` t1, `t_event_list` t2, `t_event_status` t3"
       " WHERE t1.`id`=t2.`config_id` AND t2.`type_id`=4 AND t2.`status_id`=t3.`id` AND t3.`status`='ON' ";
   
-  	while(res.next()) {
-    	res>>id>>cppdb::into(devid, devid_nullTag)>>cppdb::into(ip, nullTag)>>cppdb::into(qname, nullTag)>>qcount;
-      	res>>weekday>>stime>>etime>>coverrange;
-      	if (devid_nullTag==cppdb::null_value)
-        	p = common_cfg.add_event();
-      	else
-      	{
-        	try{
-          	p = cfg[dev_to_agent.at(devid)].add_event();
-          	p->set_devid(devid);
-        	}catch (const std::out_of_range& oor) {
-          	continue;
-        	}
-      	}
+    while(res.next()) {
+      res>>id>>cppdb::into(devid, devid_nullTag)>>cppdb::into(ip, nullTag)>>cppdb::into(qname, nullTag)>>qcount;
+        res>>weekday>>stime>>etime>>coverrange;
+        if (devid_nullTag==cppdb::null_value)
+          p = common_cfg.add_event();
+        else
+        {
+          try{
+            p = cfg[dev_to_agent.at(devid)].add_event();
+            p->set_devid(devid);
+          }catch (const std::out_of_range& oor) {
+            continue;
+          }
+        }
 
       p->set_type_id(4);
       p->set_config_id(id);
@@ -825,7 +836,7 @@ static inline void construct_asset_config(Config& common_cfg) {
   pd->set_format(ITEM);
   cppdb::result res;
   try {
-    res = *sql << "SELECT `ip`, `devid` FROM `t_internal_ip_list`";
+    res = *sql << "SELECT t1.`ip`, t1.`devid` FROM `t_internal_ip_list` t1, `t_device` t2 where t1.`devid` = t2.`id` AND t2.`disabled` = 'N'";
     while (res.next()) {
       res>>cppdb::into(ip, ip_nullTag)>>cppdb::into(devid, devid_nullTag);
       p = pd->add_item();
@@ -953,15 +964,19 @@ static void push() {
   map<u32,u32> dev_to_agent;
   string devname;
   try {
-    res = *sql << "select t1.id,t1.name,t1.type,t2.id,t2.ip,t1.ip,t1.port,t1.disabled,t1.flowtype,t1.model "
-                  "from t_device t1 join t_agent t2 on t1.agentid = t2.id ";
+    res = *sql << "select t1.id, t1.name, t1.type, t2.id, t2.ip, t1.ip, t1.port, t1.disabled, t1.flowtype, t1.model, \
+                  t1.pcap_level, t1.template, t1.filter, t1.interface \
+                  from t_device t1 join t_agent t2 on t1.agentid = t2.id ";
     u32 devid, agentid, port;
     string devtype, devip, agentip, disabled;
     string flowtype;
     string devmodel;
+    u32 pcap_level;
+    string temp, filter, interface;
     while (res.next()) {
-      res >> devid >> devname >> devtype >> agentid >> agentip >> devip >> port
-          >> disabled >> flowtype >> devmodel;
+      res >> devid >> devname >> devtype >> agentid >> agentip >> devip >> port >> disabled >> flowtype >> devmodel\
+          >> pcap_level >> temp >> filter >> interface;
+      if (disabled == "Y") continue;
       agentips[agentid] = agentip;
       Config& p = configs[agentid];
       auto dev = p.add_dev();
@@ -974,6 +989,10 @@ static void push() {
       dev->set_disabled(disabled == "Y");
       dev->set_flowtype(flowtype);
       dev->set_model(boost::to_upper_copy(devmodel));
+      dev->set_pcap_level(pcap_level);
+      dev->set_temp(temp);
+      dev->set_filter(filter);
+      dev->set_interface(interface);
 
       dev_to_agent[devid] = agentid;
     }

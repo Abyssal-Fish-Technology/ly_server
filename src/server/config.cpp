@@ -66,6 +66,12 @@ int main(int argc, char *argv[])
 		freeConfigInstance(conf);
 		dlclose(handle);
 		delete sql;
+
+		string op = cgi("op");
+		if ( op=="add" || op=="mod" || op=="del" ){
+			system("/Server/bin/config_pusher");
+		}
+		
 	} else {
 		return 1;
 	}

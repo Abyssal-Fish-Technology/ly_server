@@ -102,6 +102,7 @@ bool ConfigAgent::ParseReq(cgicc::Cgicc& cgi){
 	if (!cgi("status").empty()) req->set_status(cgi("status"));
 	if (!cgi("comment").empty()) req->set_comment(cgi("comment"));
 	if (!cgi("disabled").empty()) req->set_disabled(cgi("disabled"));
+	if (!cgi("serial").empty()) req->set_serial(cgi("serial"));
 
 	return true;
 }
@@ -138,6 +139,11 @@ bool ConfigAgent::ParseReqForDevice(cgicc::Cgicc& cgi){
 	if (!cgi("port").empty()) req->set_port(atoll(cgi("port").c_str()));
 	if (!cgi("disabled").empty()) req->set_disabled(cgi("disabled"));
 	if (!cgi("flowtype").empty()) req->set_flowtype(cgi("flowtype"));
+
+	if (!cgi("interface").empty()) req->set_interface(cgi("interface"));
+	if (!cgi("pcap_level").empty()) req->set_pcap_level(atoll(cgi("pcap_level").c_str()));
+	if (!cgi("template").empty()) req->set_temp(cgi("template"));
+	if (!cgi("filter").empty()) req->set_filter(cgi("filter"));
 
 	this->_isDevice = true;
 	return true;
@@ -187,6 +193,8 @@ bool ConfigAgent::ValidateRequest(){
 				req->set_status("disconnected");
 			if ( !req->has_disabled())
 				req->set_disabled("Y");
+			if ( !req->has_serial() )
+				req->set_serial("");
 			break;
 		case DEL:
 			if ( !req->has_id() ) {
@@ -199,7 +207,7 @@ bool ConfigAgent::ValidateRequest(){
 				log_err("%s: %d: no id", __FILE__, __LINE__);
 				return Failed();
 			}
-			if ( !req->has_name() && !req->has_ip() && !req->has_creator() && !req->has_status() && !req->has_comment() && !req->has_disabled() ) {
+			if ( !req->has_name() && !req->has_ip() && !req->has_creator() && !req->has_status() && !req->has_comment() && !req->has_disabled() && !req->has_serial() ) {
 				log_err("%s: %d: no other params", __FILE__, __LINE__);
 				return Failed();
 			}
@@ -229,19 +237,42 @@ bool ConfigAgent::ValidateRequestForDevice(){
 	switch (_op){
 		case ADD:
 			if ( !req->has_name() ) {
-				log_err("%s: %d: no name or ip", __FILE__, __LINE__);
+				log_err("%s: %d: not config name", __FILE__, __LINE__);
 				return Failed();
 			}
 			if ( !req->has_type() )
 				req->set_type("router");
 			if ( !req->has_disabled() )
 				req->set_disabled("N");
+			if ( !req->has_port() ){
+				log_err("%s: %d: not config port", __FILE__, __LINE__);
+				return Failed();
+			}
 			if ( !CheckAgentAndPort(req) ) {
 				log_err("%s: %d: CheckAgentAndPort() failed", __FILE__, __LINE__);
 				return Failed();
 			}
 			if ( req->flowtype()=="" )
 				req->set_flowtype("netflow");
+
+			if ( !req->has_pcap_level() )
+				req->set_pcap_level(2);
+			else {
+				if (req->pcap_level() < 0 || req->pcap_level() > 3 ){
+					log_err("%s: %d: pcap_level out of range", __FILE__, __LINE__);
+					return Failed();
+				}
+			}
+
+			if ( !req->has_temp() )
+				req->set_temp("");
+
+			if ( !req->has_filter() )
+				req->set_filter("");
+
+			if ( !req->has_interface() )
+				req->set_interface("");
+
 			break;
 		case DEL:
 			if ( !req->has_id() ) {
@@ -254,7 +285,10 @@ bool ConfigAgent::ValidateRequestForDevice(){
 				log_err("%s: %d: no id", __FILE__, __LINE__);
 				return Failed();
 			}
-			if ( !req->has_name() && !req->has_type() && !req->has_model() && !req->has_agentid() && !req->has_creator() && !req->has_comment() && !req->has_ip() && !req->has_port() && !req->has_disabled() ) {
+			if ( !req->has_name() && !req->has_type() && !req->has_model() && 
+				 !req->has_agentid() && !req->has_creator() && !req->has_comment() && 
+				 !req->has_ip() && !req->has_port() && !req->has_disabled() && 
+				 !req->has_pcap_level() && !req->has_temp() && !req->has_filter() && !req->has_interface() ) {
 				log_err("%s: %d: no other params", __FILE__, __LINE__);
 				return Failed();
 			}
@@ -262,6 +296,15 @@ bool ConfigAgent::ValidateRequestForDevice(){
 				log_err("%s: %d: CheckAgentAndPort() failed", __FILE__, __LINE__);
 				return Failed();
 			}
+
+			if ( !req->has_temp() )
+				req->set_temp("");
+
+			if ( !req->has_filter() )
+				req->set_filter("");
+
+			if ( !req->has_interface() )
+				req->set_interface("");
 			break;
 		case GET:
 			break;
@@ -319,8 +362,8 @@ bool ConfigAgent::Add(){
 		return AddDevice();
 
 	Agent *req = (Agent *)_req;
-	cppdb::statement st = *_sql << "INSERT INTO `server`.`t_agent` (`name`, `ip`, `creator`, `status`, `comment`, `disabled`) VALUES (?,?,?,?,?,?)";
-	st << req->name() << req->ip() << req->creator() << req->status() << req->comment() << req->disabled();
+	cppdb::statement st = *_sql << "INSERT INTO `server`.`t_agent` (`name`, `ip`, `creator`, `status`, `comment`, `disabled`, `serial`) VALUES (?,?,?,?,?,?,?)";
+	st << req->name() << req->ip() << req->creator() << req->status() << req->comment() << req->disabled() << req->serial();
 
 	try{
 		st << cppdb::exec;
@@ -371,6 +414,8 @@ bool ConfigAgent::Mod(){
 		stAddUpdateSet(str, "`comment` = ?");
 	if (req->has_disabled())
 		stAddUpdateSet(str, "`disabled` = ?");
+	if (req->has_serial())
+		stAddUpdateSet(str, "`serial` = ?");
 	str+=" WHERE id = ?";
 	try{
 		cppdb::statement st = *_sql <<str;
@@ -386,6 +431,8 @@ bool ConfigAgent::Mod(){
 			st << req->comment();
 		if (req->has_disabled())
 			st << req->disabled();
+		if (req->has_serial())
+			st << req->serial();
 		st<<req->id();
 		st<<cppdb::exec;
 	} catch ( cppdb::cppdb_error const &e ){
@@ -405,7 +452,7 @@ bool ConfigAgent::Get(){
 
 	Agent *req = (Agent *)_req;
 
-	string str = "SELECT `id`, `name`, `ip`, `creator`, `status`, `comment`, `disabled` FROM `t_agent` WHERE 1";
+	string str = "SELECT `id`, `name`, `ip`, `creator`, `status`, `comment`, `disabled`, `serial` FROM `t_agent` WHERE 1";
 
 	if ( req->has_id() )
 		str += " AND `id` = ?";
@@ -421,6 +468,8 @@ bool ConfigAgent::Get(){
 		str += " AND `comment` = ?";
 	if ( req->has_disabled() )
 		str += " AND `disabled` = ?";
+	if ( req->has_serial() )
+		str += " AND `serial` = ?";
 
 	cppdb::statement st = *_sql <<str;
 
@@ -438,6 +487,8 @@ bool ConfigAgent::Get(){
 		st <<req->comment();
 	if ( req->has_disabled() )
 		st <<req->disabled();
+	if ( req->has_serial() )
+		st <<req->serial();
 
 	cppdb::result r = st;
 	bool first = true;
@@ -478,6 +529,10 @@ bool ConfigAgent::Get(){
 
 		r>>s;
 		output_string("disabled", s);
+		cout<<",";
+		
+		r>>s;
+		output_string("serial", s);
 		cout<<"}";
 	}
 
@@ -487,12 +542,17 @@ bool ConfigAgent::Get(){
 bool ConfigAgent::AddDevice(){
 	Device *req = (Device *)_req;
 
-	cppdb::statement st = *_sql << "INSERT INTO `t_device`(`name`, `type`, `model`, `agentid`, `creator`, `comment`, `ip`, `port`, `disabled`, `flowtype`) VALUES (?,?,?,?,?,?,?,?,?,?)";
+	cppdb::statement st = *_sql << "INSERT INTO `t_device`\
+									(`name`, `type`, `model`, `agentid`, `creator`, \
+									`comment`, `ip`, `port`, `disabled`, `flowtype`, \
+									`pcap_level`, `template`, `filter`, `interface`) \
+									VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
 	st << req->name() << req->type() << req->model();
 	if ( req->has_agentid() && req->agentid()>0 ) st << req->agentid();
 	else st << cppdb::null;
 	st << req->creator() << req->comment() << req->ip() << req->port() << req->disabled() << req->flowtype();
-
+	st << req->pcap_level() << req->temp() << req->filter() << req->interface();
 	try{
 		st << cppdb::exec;
 	} catch ( cppdb::cppdb_error const &e ){
@@ -541,6 +601,14 @@ bool ConfigAgent::ModDevice(){
 		stAddUpdateSet(str, "`disabled` = ?");
 	if (req->has_flowtype())
 		stAddUpdateSet(str, "`flowtype` = ?");
+	if (req->has_pcap_level())
+		stAddUpdateSet(str, "`pcap_level` = ?");
+	if (req->has_temp())
+		stAddUpdateSet(str, "`template` = ?");
+	if (req->has_filter())
+		stAddUpdateSet(str, "`filter` = ?");
+	if (req->has_interface())
+		stAddUpdateSet(str, "`interface` = ?");
 	str+=" WHERE id = ?";
 	try{
 		cppdb::statement st = *_sql <<str;
@@ -568,6 +636,14 @@ bool ConfigAgent::ModDevice(){
 			st << req->disabled();
 		if (req->has_flowtype())
 			st << req->flowtype();
+		if (req->has_pcap_level())
+			st << req->pcap_level();
+		if (req->has_temp())
+			st << req->temp();
+		if (req->has_filter())
+			st << req->filter();
+		if (req->has_interface())
+			st << req->interface();
 		st<<req->id();
 		st<<cppdb::exec;
 	} catch ( cppdb::cppdb_error const &e ){
@@ -581,7 +657,10 @@ bool ConfigAgent::ModDevice(){
 bool ConfigAgent::GetDevice(){
 	Device *req = (Device *)_req;
 
-	string str = "SELECT `id`, `name`, `type`, `model`, `agentid`, `creator`, `comment`, `ip`, `port`, `disabled`, `flowtype` FROM `t_device` WHERE 1";
+	string str = "SELECT `id`, `name`, `type`, `model`, `agentid`, \
+				`creator`, `comment`, `ip`, `port`, `disabled`, `flowtype`, \
+				`pcap_level`, `template`, `filter`, `interface` \
+				FROM `t_device` WHERE 1";
 
 	if ( req->has_id() )
 		str += " AND `id` = ?";
@@ -609,6 +688,10 @@ bool ConfigAgent::GetDevice(){
 		str += " AND `disabled` = ?";
 	if ( req->has_flowtype() )
 		str += " AND `flowtype` = ?";
+	if ( req->has_pcap_level() )
+		str += " AND `pcap_level` = ?";
+	if ( req->has_interface() )
+		str += " AND `interface` = ?";
 
 	cppdb::statement st = *_sql <<str;
 
@@ -634,6 +717,10 @@ bool ConfigAgent::GetDevice(){
 		st <<req->disabled();
 	if ( req->has_flowtype() )
 		st <<req->flowtype();
+	if ( req->has_pcap_level() )
+		st <<req->pcap_level();
+	if ( req->has_interface() )
+		st <<req->interface();
 
 	cppdb::result r = st;
 	bool first = true;
@@ -694,6 +781,31 @@ bool ConfigAgent::GetDevice(){
 
 		r>>s;
 		output_string("flowtype", s);
+		cout<<",";
+
+		r>>u;
+		output_u64("pcap_level", u);
+		cout<<",";
+
+		r>>cppdb::into(s,null_tag);
+		if (null_tag==cppdb::null_value)
+			output_string("template","");
+		else
+			output_string("template", s);
+		cout<<",";
+
+		r>>cppdb::into(s,null_tag);
+		if (null_tag==cppdb::null_value)
+			output_string("filter","");
+		else
+			output_string("filter", s);
+		cout<<",";
+
+		r>>cppdb::into(s,null_tag);
+		if (null_tag==cppdb::null_value)
+			output_string("interface","");
+		else
+			output_string("interface", s);
 		cout<<"}";
 	}
 

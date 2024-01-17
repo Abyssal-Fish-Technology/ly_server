@@ -55,11 +55,11 @@ static vector<u64> count_;
 
 // Fucntions used for .so
 config::Config *CreateConfigInstance(const std::string& type, cppdb::session* sql) {
-	return new config::ConfigEvent(type, sql);
+  return new config::ConfigEvent(type, sql);
 }
 
 void FreeConfigInstance(config::Config *p){
-	// delete p;
+  // delete p;
 }
 
 ///////////////////////////////////////////////////////////
@@ -388,84 +388,84 @@ static bool check_domain(std::set<string>& domain_list, const string& domain) {
 namespace config{
 
 ConfigEvent::ConfigEvent(const std::string& type, cppdb::session* sql):Config(type, sql){
-	_req = NULL;
-	_id = 0;
-	return;
+  _req = NULL;
+  _id = 0;
+  return;
 }
 ConfigEvent::~ConfigEvent(){
-	if (_req){
-		delete _req;
-	}
+  if (_req){
+    delete _req;
+  }
 }
 
 bool ConfigEvent::Process(cgicc::Cgicc& cgi){
-	bool res;
+  bool res;
 
-	cout<<"[";
-	if (!ParseReq(cgi)) {
-		cout<<"]"<<endl;
-		return false;
-	}
-	if (!ValidateRequest()) {
-		cout<<"]"<<endl;
-		return false;
-	}
+  cout<<"[";
+  if (!ParseReq(cgi)) {
+    cout<<"]"<<endl;
+    return false;
+  }
+  if (!ValidateRequest()) {
+    cout<<"]"<<endl;
+    return false;
+  }
 
-	switch (_target) {
-		case EVENT:
-			res = ProcessEvent();
-			break;
-		case TYPE:
-			res = ProcessType();
-			break;
-		case URL_TYPE:
-			res = ProcessUrlType();
-			break;
+  switch (_target) {
+    case EVENT:
+      res = ProcessEvent();
+      break;
+    case TYPE:
+      res = ProcessType();
+      break;
+    case URL_TYPE:
+      res = ProcessUrlType();
+      break;
     case EVENT_IGNORE:
       res = ProcessEventIgnore();
       break;
-		case CONFIG_THRESHOLD:
-			res = ProcessConfigThreshold();
-			break;
-		case CONFIG_PORT_SCAN:
-			res = ProcessConfigPortScan();
-			break;
-		case CONFIG_IP_SCAN:
-			res = ProcessConfigIPScan();
-			break;
-		case CONFIG_SRV:
-			res = ProcessConfigSrv();
-			break;
+    case CONFIG_THRESHOLD:
+      res = ProcessConfigThreshold();
+      break;
+    case CONFIG_PORT_SCAN:
+      res = ProcessConfigPortScan();
+      break;
+    case CONFIG_IP_SCAN:
+      res = ProcessConfigIPScan();
+      break;
+    case CONFIG_SRV:
+      res = ProcessConfigSrv();
+      break;
     case CONFIG_SUS:
       res = ProcessConfigSus();
       break;
     case CONFIG_BLACK:
       res = ProcessConfigBlack();
       break;
-		case LEVEL:
-			res = ProcessLevel();
-			break;
-		case ACTION:
-			res = ProcessAction();
-			break;
-		case CONFIG_ALL:
-			res = ProcessConfigAll();
-			break;
-		case DATA_AGGRE:
-			res = ProcessDataAggre();
-			break;
-		case CONFIG_DGA:
-			res = ProcessConfigDga();
-			break;
-		case CONFIG_DNS:
-			res = ProcessConfigDns();
-			break;
-		case CONFIG_DNSTUNNEL:
-			res = ProcessConfigDnstunnel();
-			break;
-		case CONFIG_DNSTUN_AI:
-			res = ProcessConfigDnstunAI();
-			break;
+    case LEVEL:
+      res = ProcessLevel();
+      break;
+    case ACTION:
+      res = ProcessAction();
+      break;
+    case CONFIG_ALL:
+      res = ProcessConfigAll();
+      break;
+    case DATA_AGGRE:
+      res = ProcessDataAggre();
+      break;
+    case CONFIG_DGA:
+      res = ProcessConfigDga();
+      break;
+    case CONFIG_DNS:
+      res = ProcessConfigDns();
+      break;
+    case CONFIG_DNSTUNNEL:
+      res = ProcessConfigDnstunnel();
+      break;
+    case CONFIG_DNSTUN_AI:
+      res = ProcessConfigDnstunAI();
+      break;
     case CONFIG_URL_CONTENT:
       res = ProcessConfigUrlContent();
       break;
@@ -477,228 +477,228 @@ bool ConfigEvent::Process(cgicc::Cgicc& cgi){
       break;
     default:
       break;
-	}
-	cout<<"]";
+  }
+  cout<<"]";
 
-	return res;
+  return res;
 }
 
 bool ConfigEvent::ParseReq(cgicc::Cgicc& cgi){
-	if (!cgi("id").empty())
-		_id = atoll(cgi("event_id").c_str());
+  if (!cgi("id").empty())
+    _id = atoll(cgi("event_id").c_str());
 
-	if (_type.empty())
-		return false;
-	else {
-		string target = boost::to_upper_copy(_type);
+  if (_type.empty())
+    return false;
+  else {
+    string target = boost::to_upper_copy(_type);
 
-		if (target=="EVENT")
-			_target = EVENT;
-		else if (target=="EVENT_TYPE")
-			_target = TYPE;
-		else if (target=="EVENT_URL_TYPE")
-			_target = URL_TYPE;
+    if (target=="EVENT")
+      _target = EVENT;
+    else if (target=="EVENT_TYPE")
+      _target = TYPE;
+    else if (target=="EVENT_URL_TYPE")
+      _target = URL_TYPE;
     else if (target=="EVENT_IGNORE")
       _target = EVENT_IGNORE;
-		else if (target=="EVENT_CONFIG"){
-			string event_type = boost::to_upper_copy(cgi("event_type"));
+    else if (target=="EVENT_CONFIG"){
+      string event_type = boost::to_upper_copy(cgi("event_type"));
 
-			if (event_type.empty())
-				_target = CONFIG_ALL;
-			else if (event_type=="MO")
-				_target = CONFIG_THRESHOLD;
-			else if (event_type=="PORT_SCAN")
-				_target = CONFIG_PORT_SCAN;
-			else if (event_type=="IP_SCAN")
-				_target = CONFIG_IP_SCAN;
-			else if (event_type=="SRV")
-				_target = CONFIG_SRV;
+      if (event_type.empty())
+        _target = CONFIG_ALL;
+      else if (event_type=="MO")
+        _target = CONFIG_THRESHOLD;
+      else if (event_type=="PORT_SCAN")
+        _target = CONFIG_PORT_SCAN;
+      else if (event_type=="IP_SCAN")
+        _target = CONFIG_IP_SCAN;
+      else if (event_type=="SRV")
+        _target = CONFIG_SRV;
       else if (event_type=="TI")
         _target = CONFIG_SUS;
       else if (event_type=="BLACK")
         _target = CONFIG_BLACK;
-			else if (event_type=="DGA")
-				_target = CONFIG_DGA;
-			else if (event_type=="DNS")
-				_target = CONFIG_DNS;
-			else if (event_type=="DNS_TUN")
-				_target = CONFIG_DNSTUNNEL;
-			else if (event_type=="DNSTUN_AI")
-				_target = CONFIG_DNSTUN_AI;
-			else if (event_type=="URL_CONTENT")
-				_target = CONFIG_URL_CONTENT;
-			else if (event_type=="FRN_TRIP")
-				_target = CONFIG_FRN_TRIP;
-			else if (event_type=="ICMP_TUN")
-				_target = CONFIG_ICMP_TUN;
-		}
-		else if (target=="EVENT_LEVEL")
-			_target = LEVEL;
-		else if (target=="EVENT_ACTION")
-			_target = ACTION;
-		else if (target=="EVENT_DATA_AGGRE")
-			_target = DATA_AGGRE;
-		else
-			return false;
-	}
+      else if (event_type=="DGA")
+        _target = CONFIG_DGA;
+      else if (event_type=="DNS")
+        _target = CONFIG_DNS;
+      else if (event_type=="DNS_TUN")
+        _target = CONFIG_DNSTUNNEL;
+      else if (event_type=="DNSTUN_AI")
+        _target = CONFIG_DNSTUN_AI;
+      else if (event_type=="URL_CONTENT")
+        _target = CONFIG_URL_CONTENT;
+      else if (event_type=="FRN_TRIP")
+        _target = CONFIG_FRN_TRIP;
+      else if (event_type=="ICMP_TUN")
+        _target = CONFIG_ICMP_TUN;
+    }
+    else if (target=="EVENT_LEVEL")
+      _target = LEVEL;
+    else if (target=="EVENT_ACTION")
+      _target = ACTION;
+    else if (target=="EVENT_DATA_AGGRE")
+      _target = DATA_AGGRE;
+    else
+      return false;
+  }
 
-	if (cgi("op").empty())
-		return false;
-	else {
-		string op = boost::to_upper_copy(cgi("op"));
+  if (cgi("op").empty())
+    return false;
+  else {
+    string op = boost::to_upper_copy(cgi("op"));
 
-		if (op=="ADD")
-			_op = ADD;
-		else if (op=="DEL")
-			_op = DEL;
-		else if (op=="MOD")
-			_op = MOD;
-		else if (op=="GET")
-			_op = GET;  
+    if (op=="ADD")
+      _op = ADD;
+    else if (op=="DEL")
+      _op = DEL;
+    else if (op=="MOD")
+      _op = MOD;
+    else if (op=="GET")
+      _op = GET;  
     else if (op=="DEL_EVENT")
       _op = DEL_EVENT;
-		else
-			return false;
-	}
+    else
+      return false;
+  }
 
-	switch (_target) {
-		case EVENT:
-			return ParseReqForEvent(cgi);
-			break;
-		case TYPE:
-			return ParseReqForType(cgi);
-			break;
-		case URL_TYPE:
-			return ParseReqForUrlType(cgi);
-			break;
-		case EVENT_IGNORE:
-			return ParseReqForEventIgnore(cgi);
-			break;
-		case CONFIG_THRESHOLD:
-			return ParseReqForConfigThreshold(cgi);
-			break;
-		case CONFIG_PORT_SCAN:
-			return ParseReqForConfigPortScan(cgi);
-			break;
-		case CONFIG_IP_SCAN:
-			return ParseReqForConfigIPScan(cgi);
-			break;
-		case CONFIG_SRV:
-			return ParseReqForConfigSrv(cgi);
-			break;
+  switch (_target) {
+    case EVENT:
+      return ParseReqForEvent(cgi);
+      break;
+    case TYPE:
+      return ParseReqForType(cgi);
+      break;
+    case URL_TYPE:
+      return ParseReqForUrlType(cgi);
+      break;
+    case EVENT_IGNORE:
+      return ParseReqForEventIgnore(cgi);
+      break;
+    case CONFIG_THRESHOLD:
+      return ParseReqForConfigThreshold(cgi);
+      break;
+    case CONFIG_PORT_SCAN:
+      return ParseReqForConfigPortScan(cgi);
+      break;
+    case CONFIG_IP_SCAN:
+      return ParseReqForConfigIPScan(cgi);
+      break;
+    case CONFIG_SRV:
+      return ParseReqForConfigSrv(cgi);
+      break;
     case CONFIG_SUS:
       return ParseReqForConfigSus(cgi);
       break;
     case CONFIG_BLACK:
       return ParseReqForConfigBlack(cgi);
       break;
-		case LEVEL:
-			return ParseReqForLevel(cgi);
-			break;
-		case ACTION:
-			return ParseReqForAction(cgi);
-			break;
-		case CONFIG_ALL:
-			return true;
-			break;
-		case DATA_AGGRE:
-			return ParseReqForDataAggre(cgi);
-			break;
-		case CONFIG_DGA:
-			return ParseReqForConfigDga(cgi);
-			break;
-		case CONFIG_DNS:
-			return ParseReqForConfigDns(cgi);
-			break;
-		case CONFIG_DNSTUNNEL:
-			return ParseReqForConfigDnstunnel(cgi);
-			break;
-		case CONFIG_DNSTUN_AI:
-			return ParseReqForConfigDnstunAI(cgi);
-			break;
-		case CONFIG_URL_CONTENT:
-			return ParseReqForConfigUrlContent(cgi);
-			break;
-		case CONFIG_FRN_TRIP:
-			return ParseReqForConfigFrnTrip(cgi);
-			break;
-		case CONFIG_ICMP_TUN:
-			return ParseReqForConfigIcmpTun(cgi);
-			break;
+    case LEVEL:
+      return ParseReqForLevel(cgi);
+      break;
+    case ACTION:
+      return ParseReqForAction(cgi);
+      break;
+    case CONFIG_ALL:
+      return true;
+      break;
+    case DATA_AGGRE:
+      return ParseReqForDataAggre(cgi);
+      break;
+    case CONFIG_DGA:
+      return ParseReqForConfigDga(cgi);
+      break;
+    case CONFIG_DNS:
+      return ParseReqForConfigDns(cgi);
+      break;
+    case CONFIG_DNSTUNNEL:
+      return ParseReqForConfigDnstunnel(cgi);
+      break;
+    case CONFIG_DNSTUN_AI:
+      return ParseReqForConfigDnstunAI(cgi);
+      break;
+    case CONFIG_URL_CONTENT:
+      return ParseReqForConfigUrlContent(cgi);
+      break;
+    case CONFIG_FRN_TRIP:
+      return ParseReqForConfigFrnTrip(cgi);
+      break;
+    case CONFIG_ICMP_TUN:
+      return ParseReqForConfigIcmpTun(cgi);
+      break;
     default:
       break;
-	}
+  }
 
-	return false; //This code should never execute.
+  return false; //This code should never execute.
 }
 
 bool ConfigEvent::ValidateRequest(){
-	switch (_target) {
-		case EVENT:
-			return ValidateEvent();
-			break;
-		case TYPE:
-			return ValidateType();
-			break;
-		case URL_TYPE:
-			return ValidateUrlType();
-			break;
-		case EVENT_IGNORE:
-			return ValidateEventIgnore();
-			break;
-		case CONFIG_THRESHOLD:
-			return ValidateConfigThreshold();
-			break;
-		case CONFIG_PORT_SCAN:
-			return ValidateConfigPortScan();
-			break;
-		case CONFIG_IP_SCAN:
-			return ValidateConfigIPScan();
-		case CONFIG_SRV:
-			return ValidateConfigSrv();
-			break;
-		case CONFIG_SUS:
-			return ValidateConfigSus();
-			break;
-		case CONFIG_BLACK:
-			return ValidateConfigBlack();
-			break;
-		case LEVEL:
-			return ValidateLevel();
-			break;
-		case ACTION:
-			return ValidateAction();
-			break;
-		case CONFIG_ALL:
-			return ValidateConfigAll();
-			break;
-		case DATA_AGGRE:
-			return ValidateDataAggre();
-			break;
-		case CONFIG_DGA:
-			return ValidateConfigDga();
-			break;
-		case CONFIG_DNS:
-			return ValidateConfigDns();
-			break;
-		case CONFIG_DNSTUNNEL:
-			return ValidateConfigDnstunnel();
-			break;
-		case CONFIG_DNSTUN_AI:
-			return ValidateConfigDnstunAI();
-			break;
-		case CONFIG_URL_CONTENT:
-			return ValidateConfigUrlContent();
-			break;
-		case CONFIG_FRN_TRIP:
-			return ValidateConfigFrnTrip();
-			break;
-		case CONFIG_ICMP_TUN:
-			return ValidateConfigIcmpTun();
-			break;
-	}
+  switch (_target) {
+    case EVENT:
+      return ValidateEvent();
+      break;
+    case TYPE:
+      return ValidateType();
+      break;
+    case URL_TYPE:
+      return ValidateUrlType();
+      break;
+    case EVENT_IGNORE:
+      return ValidateEventIgnore();
+      break;
+    case CONFIG_THRESHOLD:
+      return ValidateConfigThreshold();
+      break;
+    case CONFIG_PORT_SCAN:
+      return ValidateConfigPortScan();
+      break;
+    case CONFIG_IP_SCAN:
+      return ValidateConfigIPScan();
+    case CONFIG_SRV:
+      return ValidateConfigSrv();
+      break;
+    case CONFIG_SUS:
+      return ValidateConfigSus();
+      break;
+    case CONFIG_BLACK:
+      return ValidateConfigBlack();
+      break;
+    case LEVEL:
+      return ValidateLevel();
+      break;
+    case ACTION:
+      return ValidateAction();
+      break;
+    case CONFIG_ALL:
+      return ValidateConfigAll();
+      break;
+    case DATA_AGGRE:
+      return ValidateDataAggre();
+      break;
+    case CONFIG_DGA:
+      return ValidateConfigDga();
+      break;
+    case CONFIG_DNS:
+      return ValidateConfigDns();
+      break;
+    case CONFIG_DNSTUNNEL:
+      return ValidateConfigDnstunnel();
+      break;
+    case CONFIG_DNSTUN_AI:
+      return ValidateConfigDnstunAI();
+      break;
+    case CONFIG_URL_CONTENT:
+      return ValidateConfigUrlContent();
+      break;
+    case CONFIG_FRN_TRIP:
+      return ValidateConfigFrnTrip();
+      break;
+    case CONFIG_ICMP_TUN:
+      return ValidateConfigIcmpTun();
+      break;
+  }
 
-	return false; //This code should never execute.
+  return false; //This code should never execute.
 }
 
 bool ConfigEvent::ProcessEvent(){
@@ -986,10 +986,10 @@ bool ConfigEvent::ProcessEvent(){
 }
 
 bool ConfigEvent::ProcessEventIgnore(){
-	EventIgnore *req = (EventIgnore *)this->_req;
+  EventIgnore *req = (EventIgnore *)this->_req;
 
-	switch (_op){
-		case ADD:{
+  switch (_op){
+    case ADD:{
       cppdb::statement st = *_sql << "INSERT INTO `t_event_ignore`(`time`, `lip`, `tip`, `tport`, `protocol`, `domain`, `desc`, `weekday`, `stime`, `etime`, `coverrange`, `count`) VALUES (FROM_UNIXTIME(?),?,?,?,?,?,?,?,?,?,?,?)";
       st << req->time();
       if ( req->lip()=="" ) st << cppdb::null;
@@ -1013,10 +1013,10 @@ bool ConfigEvent::ProcessEventIgnore(){
         log_err("%s", e.what());
         return Failed();
       }
-			return Executed("\"id\": "+to_string(st.last_insert_id()));
-			break;
-		}
-		case DEL:{
+      return Executed("\"id\": "+to_string(st.last_insert_id()));
+      break;
+    }
+    case DEL:{
       try{
         cppdb::statement st = *_sql << "DELETE FROM `t_event_ignore` WHERE `id` = ?";
         st << req->id() << cppdb::exec;
@@ -1024,10 +1024,10 @@ bool ConfigEvent::ProcessEventIgnore(){
         log_err("%s", e.what());
         return Failed();
       }
-			return Executed();
-			break;
-		}
-		case MOD:{
+      return Executed();
+      break;
+    }
+    case MOD:{
       string str = "UPDATE `t_event_ignore` SET ";
       if (req->has_time())
         stAddUpdateSet(str, "`time` = FROM_UNIXTIME(?)");
@@ -1098,11 +1098,11 @@ bool ConfigEvent::ProcessEventIgnore(){
         log_err("%s", e.what());
         return Failed();
       }
-			return Executed();
-			break;
-		}
-		case GET:{
-			string str = "SELECT `id`, `time`, `lip`, `tip`, `tport`, `protocol`, `domain`, `desc`, `weekday`, `stime`, `etime`, `coverrange`,`count` FROM `t_event_ignore` WHERE 1";
+      return Executed();
+      break;
+    }
+    case GET:{
+      string str = "SELECT `id`, `time`, `lip`, `tip`, `tport`, `protocol`, `domain`, `desc`, `weekday`, `stime`, `etime`, `coverrange`,`count` FROM `t_event_ignore` WHERE 1";
 
       if ( req->has_id() )
         str += " AND `id` = ?";
@@ -1544,69 +1544,69 @@ bool ConfigEvent::ProcessEventIgnore(){
       return Executed();
       break;
     }
-		default:
-			return false; // This code should never execute
-			break;
-	}
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessType(){
-	EventType *req = (EventType *)this->_req;
+  EventType *req = (EventType *)this->_req;
 
-	switch (_op){
-		case ADD:
-			return false;
-			break;
-		case DEL:
-			return false;
-			break;
-		case MOD:
-			return false;
-			break;
-		case GET:{
-			string str = "SELECT `id`, `desc` FROM `t_event_type` WHERE 1";
+  switch (_op){
+    case ADD:
+      return false;
+      break;
+    case DEL:
+      return false;
+      break;
+    case MOD:
+      return false;
+      break;
+    case GET:{
+      string str = "SELECT `id`, `desc` FROM `t_event_type` WHERE 1";
 
-			if ( req->has_id() )
-				str += " AND `id` = ?";
-			if ( req->has_desc() )
-				str += " AND `desc` = ?";
+      if ( req->has_id() )
+        str += " AND `id` = ?";
+      if ( req->has_desc() )
+        str += " AND `desc` = ?";
 
-			cppdb::statement st = *_sql <<str;
+      cppdb::statement st = *_sql <<str;
 
-			if ( req->has_id() )
-				st <<req->id();
-			if ( req->has_desc() )
-				st <<req->desc();
+      if ( req->has_id() )
+        st <<req->id();
+      if ( req->has_desc() )
+        st <<req->desc();
 
-			cppdb::result r = st;
-			bool first = true;
-			while (r.next()){
-				u64 id;
-				string desc;
+      cppdb::result r = st;
+      bool first = true;
+      while (r.next()){
+        u64 id;
+        string desc;
 
-				if (first){
-					cout<<"{";
-					first = false;
-				}
-				else
-					cout<<","<<endl<<"{";
+        if (first){
+          cout<<"{";
+          first = false;
+        }
+        else
+          cout<<","<<endl<<"{";
 
-				r>>id>>desc;
-				output_u64("id", id);
-				cout<<",";
-				output_string("desc", desc);
-				cout<<"}";
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+        r>>id>>desc;
+        output_u64("id", id);
+        cout<<",";
+        output_string("desc", desc);
+        cout<<"}";
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessUrlType(){
@@ -1666,14 +1666,25 @@ bool ConfigEvent::ProcessUrlType(){
   return true;
 }
 
+static std::string replace_substr(std::string str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length();
+    }
+    return str;
+}
+
 bool ConfigEvent::ProcessConfigUrlContent(bool out_type) {
   EventConfig *req = (EventConfig *)this->_req;
+
+  string url_pat = replace_substr(req->pat(), "\\", "\\\\");
 
   switch(_op){
     case ADD:{
       cppdb::statement st = *_sql << "INSERT INTO `t_event_config_url_content`(`type`, `min`, `pat`) VALUES (?,?,?)";
       try{
-        st << req->url_type() << req->min() << req->pat() << cppdb::exec;
+        st << req->url_type() << req->min() << url_pat << cppdb::exec;
       } catch (cppdb::cppdb_error const &e) {
         log_err("%s", e.what());
         return Failed();
@@ -1717,7 +1728,7 @@ bool ConfigEvent::ProcessConfigUrlContent(bool out_type) {
             st << atol(req->min().c_str());
         } 
         if (req->has_pat())
-          st << req->pat();
+          st << url_pat;
 
         st<<req->id();
         st<<cppdb::exec;
@@ -1748,7 +1759,7 @@ bool ConfigEvent::ProcessConfigUrlContent(bool out_type) {
         if (req->has_url_type())
           st << req->url_type();
         if (req->has_pat())
-          st << req->pat(); 
+          st << url_pat; 
       } else
         st = *_sql <<str;
 
@@ -1797,204 +1808,204 @@ bool ConfigEvent::ProcessConfigUrlContent(bool out_type) {
 }
 
 bool ConfigEvent::ProcessConfigThreshold(bool out_type){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:{
-			cppdb::statement st = *_sql << "INSERT INTO `t_event_config_threshold`(`moid`, `thres_mode`, `data_type`, `min`, `max`, `grep_rule`) VALUES (?,?,?,?,?,?)";
-			try{
-				st << req->moid() << req->thres_mode() << req->data_type();
-				if (req->min()=="")
-					st << cppdb::null;
-				else
-					st << req->min();
-				if (req->max()=="")
-					st << cppdb::null;
-				else
-					st << req->max();
-				st << req->grep_rule() << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+  switch (_op){
+    case ADD:{
+      cppdb::statement st = *_sql << "INSERT INTO `t_event_config_threshold`(`moid`, `thres_mode`, `data_type`, `min`, `max`, `grep_rule`) VALUES (?,?,?,?,?,?)";
+      try{
+        st << req->moid() << req->thres_mode() << req->data_type();
+        if (req->min()=="")
+          st << cppdb::null;
+        else
+          st << req->min();
+        if (req->max()=="")
+          st << cppdb::null;
+        else
+          st << req->max();
+        st << req->grep_rule() << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed("\"id\": "+to_string(st.last_insert_id()));
-			break;
-		}
-		case DEL:{
-			cppdb::statement st = *_sql << "DELETE FROM `t_event_config_threshold` WHERE `id` = ?;";
-			try{
-				st << req->id() << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed("\"id\": "+to_string(st.last_insert_id()));
+      break;
+    }
+    case DEL:{
+      cppdb::statement st = *_sql << "DELETE FROM `t_event_config_threshold` WHERE `id` = ?;";
+      try{
+        st << req->id() << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed();
-			break;
-		}
-		case MOD:{
-			string str = "UPDATE `t_event_config_threshold` SET ";
-			if (req->has_moid())
-				stAddUpdateSet(str, "`moid` = ?");
-			if (req->has_thres_mode())
-				stAddUpdateSet(str, "`thres_mode` = ?");
-			if (req->has_data_type())
-				stAddUpdateSet(str, "`data_type` = ?");
-			if (req->has_min())
-				stAddUpdateSet(str, "`min` = ?");
-			if (req->has_max())
-				stAddUpdateSet(str, "`max` = ?");
-			if (req->has_grep_rule())
-				stAddUpdateSet(str, "`grep_rule` = ?");
-			str+=" WHERE id = ?";
-			try{
-				cppdb::statement st = *_sql <<str;
-				if (req->has_moid())
-					st << req->moid();
-				if (req->has_thres_mode())
-					st << req->thres_mode();
-				if (req->has_data_type())
-					st << req->data_type();
-				if (req->has_min()){
-					if (req->min()=="")
-						st << cppdb::null;
-					else
-						st << atol(req->min().c_str());
-				}
-				if (req->has_max()){
-					if (req->max()=="")
-						st << cppdb::null;
-					else
-						st << atol(req->max().c_str());
-				}
-				if (req->has_grep_rule())
-					st << req->grep_rule();
-				st<<req->id();
-				st<<cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed();
+      break;
+    }
+    case MOD:{
+      string str = "UPDATE `t_event_config_threshold` SET ";
+      if (req->has_moid())
+        stAddUpdateSet(str, "`moid` = ?");
+      if (req->has_thres_mode())
+        stAddUpdateSet(str, "`thres_mode` = ?");
+      if (req->has_data_type())
+        stAddUpdateSet(str, "`data_type` = ?");
+      if (req->has_min())
+        stAddUpdateSet(str, "`min` = ?");
+      if (req->has_max())
+        stAddUpdateSet(str, "`max` = ?");
+      if (req->has_grep_rule())
+        stAddUpdateSet(str, "`grep_rule` = ?");
+      str+=" WHERE id = ?";
+      try{
+        cppdb::statement st = *_sql <<str;
+        if (req->has_moid())
+          st << req->moid();
+        if (req->has_thres_mode())
+          st << req->thres_mode();
+        if (req->has_data_type())
+          st << req->data_type();
+        if (req->has_min()){
+          if (req->min()=="")
+            st << cppdb::null;
+          else
+            st << atol(req->min().c_str());
+        }
+        if (req->has_max()){
+          if (req->max()=="")
+            st << cppdb::null;
+          else
+            st << atol(req->max().c_str());
+        }
+        if (req->has_grep_rule())
+          st << req->grep_rule();
+        st<<req->id();
+        st<<cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed();
-			break;
-		}
-		case GET:{
-			cppdb::statement st;
-			string str = "SELECT `id`, `moid`, `thres_mode`, `data_type`, `min`, `max`, `grep_rule` FROM `t_event_config_threshold` WHERE 1";
+      return Executed();
+      break;
+    }
+    case GET:{
+      cppdb::statement st;
+      string str = "SELECT `id`, `moid`, `thres_mode`, `data_type`, `min`, `max`, `grep_rule` FROM `t_event_config_threshold` WHERE 1";
 
-			if ( req!=NULL ){
-				if ( req->has_id() )
-					str += " AND `id` = ?";
-				if ( req->has_moid() )
-					str += " AND `moid` = ?";
-				if ( req->has_thres_mode() )
-					str += " AND `thres_mode` = ?";
-				if ( req->has_data_type() )
-					str += " AND `data_type` = ?";
-				if ( req->has_min() ){
-					if ( req->min()=="" )
-						str += " AND `min` IS NULL";
-					else
-						str += " AND `min` = ?";
-				}
-				if ( req->has_max() ){
-					if ( req->max()=="" )
-						str += " AND `max` IS NULL";
-					else
-						str += " AND `max` = ?";
-				}
-				if (req->has_grep_rule())
-					str += " AND `grep_rule` = ?";
+      if ( req!=NULL ){
+        if ( req->has_id() )
+          str += " AND `id` = ?";
+        if ( req->has_moid() )
+          str += " AND `moid` = ?";
+        if ( req->has_thres_mode() )
+          str += " AND `thres_mode` = ?";
+        if ( req->has_data_type() )
+          str += " AND `data_type` = ?";
+        if ( req->has_min() ){
+          if ( req->min()=="" )
+            str += " AND `min` IS NULL";
+          else
+            str += " AND `min` = ?";
+        }
+        if ( req->has_max() ){
+          if ( req->max()=="" )
+            str += " AND `max` IS NULL";
+          else
+            str += " AND `max` = ?";
+        }
+        if (req->has_grep_rule())
+          str += " AND `grep_rule` = ?";
 
-				st = *_sql <<str;
+        st = *_sql <<str;
 
-				if ( req->has_id() )
-					st <<req->id();
-				if ( req->has_moid() )
-					st <<req->moid();
-				if ( req->has_thres_mode() )
-					st <<req->thres_mode();
-				if ( req->has_data_type() )
-					st <<req->data_type();
-				if ( req->has_min() && req->min()!="" )
-					st <<req->min();
-				if ( req->has_max() && req->max()!="" )
-					st <<req->max();
-				if (req->has_grep_rule())
-					st <<req->grep_rule();
-			}
-			else
-				st = *_sql <<str;
+        if ( req->has_id() )
+          st <<req->id();
+        if ( req->has_moid() )
+          st <<req->moid();
+        if ( req->has_thres_mode() )
+          st <<req->thres_mode();
+        if ( req->has_data_type() )
+          st <<req->data_type();
+        if ( req->has_min() && req->min()!="" )
+          st <<req->min();
+        if ( req->has_max() && req->max()!="" )
+          st <<req->max();
+        if (req->has_grep_rule())
+          st <<req->grep_rule();
+      }
+      else
+        st = *_sql <<str;
 
-			cppdb::result r = st;
-			bool first = true;
-			while (r.next()){
-				u64 u;
-				string s;
-				cppdb::null_tag_type null_tag;
+      cppdb::result r = st;
+      bool first = true;
+      while (r.next()){
+        u64 u;
+        string s;
+        cppdb::null_tag_type null_tag;
 
-				if (first){
-					cout<<"{";
-					first = false;
-				}
-				else
-					cout<<","<<endl<<"{";
+        if (first){
+          cout<<"{";
+          first = false;
+        }
+        else
+          cout<<","<<endl<<"{";
 
-				r>>u;
-				output_u64("id", u);
-				cout<<",";
+        r>>u;
+        output_u64("id", u);
+        cout<<",";
 
-				if (out_type){
-					output_string("config_type", "thres");
-					cout<<",";
-				}
+        if (out_type){
+          output_string("config_type", "thres");
+          cout<<",";
+        }
 
-				r>>u;
-				output_u64("moid", u);
-				cout<<",";
+        r>>u;
+        output_u64("moid", u);
+        cout<<",";
 
-				r>>s;
-				output_string("thres_mode", s);
-				cout<<",";
+        r>>s;
+        output_string("thres_mode", s);
+        cout<<",";
 
-				r>>s;
-				output_string("data_type", s);
-				cout<<",";
+        r>>s;
+        output_string("data_type", s);
+        cout<<",";
 
-				r>>cppdb::into(u,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("min","");
-				else
-					output_u64("min", u);
-				cout<<",";
+        r>>cppdb::into(u,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("min","");
+        else
+          output_u64("min", u);
+        cout<<",";
 
-				r>>cppdb::into(u,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("max","");
-				else
-					output_u64("max", u);
-				cout<<",";
+        r>>cppdb::into(u,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("max","");
+        else
+          output_u64("max", u);
+        cout<<",";
 
-				r>>s;
-				output_string("grep_rule", s);
-				cout<<"}";
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+        r>>s;
+        output_string("grep_rule", s);
+        cout<<"}";
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessConfigSus(bool out_type){
@@ -2284,1002 +2295,1002 @@ bool ConfigEvent::ProcessConfigBlack(bool out_type){
 }
 
 bool ConfigEvent::ProcessConfigPortScan(bool out_type){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:{
-			cppdb::statement st = *_sql << "INSERT INTO `t_event_config_port_scan`(`min_peerips`, `max_peerips`, `ip`, `port`, `protocol`) VALUES (?,?,?,?,?)";
-			try{
-				st << req->min_peerips();
-				if ( req->max_peerips()=="" )
-					st << cppdb::null;
-				else
-					st << req->max_peerips();
-				if ( req->ip()=="" )
-					st << cppdb::null;
-				else
-					st << req->ip();
-				if ( req->port()=="" )
-					st << cppdb::null;
-				else
-					st << req->port();
-				if ( req->protocol()=="" )
-					st << cppdb::null;
-				else
-					st << req->protocol();
-				st << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+  switch (_op){
+    case ADD:{
+      cppdb::statement st = *_sql << "INSERT INTO `t_event_config_port_scan`(`min_peerips`, `max_peerips`, `ip`, `port`, `protocol`) VALUES (?,?,?,?,?)";
+      try{
+        st << req->min_peerips();
+        if ( req->max_peerips()=="" )
+          st << cppdb::null;
+        else
+          st << req->max_peerips();
+        if ( req->ip()=="" )
+          st << cppdb::null;
+        else
+          st << req->ip();
+        if ( req->port()=="" )
+          st << cppdb::null;
+        else
+          st << req->port();
+        if ( req->protocol()=="" )
+          st << cppdb::null;
+        else
+          st << req->protocol();
+        st << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed("\"id\": "+to_string(st.last_insert_id()));
-			break;
-		}
-		case DEL:{
-			cppdb::statement st = *_sql << "DELETE FROM `t_event_config_port_scan` WHERE `id` = ?;";
-			try{
-				st << req->id() << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed("\"id\": "+to_string(st.last_insert_id()));
+      break;
+    }
+    case DEL:{
+      cppdb::statement st = *_sql << "DELETE FROM `t_event_config_port_scan` WHERE `id` = ?;";
+      try{
+        st << req->id() << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed();
-			break;
-		}
-		case MOD:{
-			string str = "UPDATE `t_event_config_port_scan` SET ";
-			if (req->has_min_peerips())
-				stAddUpdateSet(str, "`min_peerips` = ?");
-			if (req->has_max_peerips())
-				stAddUpdateSet(str, "`max_peerips` = ?");
-			if (req->has_ip())
-				stAddUpdateSet(str, "`ip` = ?");
-			if (req->has_port())
-				stAddUpdateSet(str, "`port` = ?");
-			if (req->has_protocol())
-				stAddUpdateSet(str, "`protocol` = ?");
-			str+=" WHERE id = ?";
-			try{
-				cppdb::statement st = *_sql <<str;
-				if (req->has_min_peerips())
-					st << req->min_peerips();
-				if (req->has_max_peerips()){
-					if (req->max_peerips()=="")
-						st << cppdb::null;
-					else
-						st << atol(req->max_peerips().c_str());
-				}
-				if (req->has_ip()){
-					if (req->ip()=="")
-						st << cppdb::null;
-					else
-						st << req->ip();
-				}
-				if (req->has_port()){
-					if (req->port()=="")
-						st << cppdb::null;
-					else
-						st << req->port();
-				}
-				if (req->has_protocol()){
-					if (req->protocol()=="")
-						st << cppdb::null;
-					else
-						st << req->protocol();
-				}
-				st<<req->id();
-				st<<cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed();
+      break;
+    }
+    case MOD:{
+      string str = "UPDATE `t_event_config_port_scan` SET ";
+      if (req->has_min_peerips())
+        stAddUpdateSet(str, "`min_peerips` = ?");
+      if (req->has_max_peerips())
+        stAddUpdateSet(str, "`max_peerips` = ?");
+      if (req->has_ip())
+        stAddUpdateSet(str, "`ip` = ?");
+      if (req->has_port())
+        stAddUpdateSet(str, "`port` = ?");
+      if (req->has_protocol())
+        stAddUpdateSet(str, "`protocol` = ?");
+      str+=" WHERE id = ?";
+      try{
+        cppdb::statement st = *_sql <<str;
+        if (req->has_min_peerips())
+          st << req->min_peerips();
+        if (req->has_max_peerips()){
+          if (req->max_peerips()=="")
+            st << cppdb::null;
+          else
+            st << atol(req->max_peerips().c_str());
+        }
+        if (req->has_ip()){
+          if (req->ip()=="")
+            st << cppdb::null;
+          else
+            st << req->ip();
+        }
+        if (req->has_port()){
+          if (req->port()=="")
+            st << cppdb::null;
+          else
+            st << req->port();
+        }
+        if (req->has_protocol()){
+          if (req->protocol()=="")
+            st << cppdb::null;
+          else
+            st << req->protocol();
+        }
+        st<<req->id();
+        st<<cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed();
-			break;
-		}
-		case GET:{
-			cppdb::statement st;
-			string str = "SELECT `id`, `min_peerips`, `max_peerips`, `ip`, `port`, `protocol` FROM `t_event_config_port_scan` WHERE 1";
+      return Executed();
+      break;
+    }
+    case GET:{
+      cppdb::statement st;
+      string str = "SELECT `id`, `min_peerips`, `max_peerips`, `ip`, `port`, `protocol` FROM `t_event_config_port_scan` WHERE 1";
 
-			if ( req!=NULL ){
-				if ( req->has_id() )
-					str += " AND `id` = ?";
-				if ( req->has_min_peerips() )
-					str += " AND `min_peerips` = ?";
-				if ( req->has_max_peerips() ){
-					if (req->max_peerips()=="")
-						str += " AND `max_peerips` IS NULL";
-					else
-						str += " AND `max_peerips` = ?";
-				}
-				if ( req->has_ip() ){
-					if (req->ip()=="")
-						str += " AND `ip` IS NULL";
-					else
-						str += " AND `ip` = ?";
-				}
-				if ( req->has_port() ){
-					if (req->port()=="")
-						str += " AND `port` IS NULL";
-					else
-						str += " AND `port` = ?";
-				}
-				if ( req->has_protocol() ){
-					if (req->protocol()=="")
-						str += " AND `protocol` IS NULL";
-					else
-						str += " AND `protocol` = ?";
-				}
+      if ( req!=NULL ){
+        if ( req->has_id() )
+          str += " AND `id` = ?";
+        if ( req->has_min_peerips() )
+          str += " AND `min_peerips` = ?";
+        if ( req->has_max_peerips() ){
+          if (req->max_peerips()=="")
+            str += " AND `max_peerips` IS NULL";
+          else
+            str += " AND `max_peerips` = ?";
+        }
+        if ( req->has_ip() ){
+          if (req->ip()=="")
+            str += " AND `ip` IS NULL";
+          else
+            str += " AND `ip` = ?";
+        }
+        if ( req->has_port() ){
+          if (req->port()=="")
+            str += " AND `port` IS NULL";
+          else
+            str += " AND `port` = ?";
+        }
+        if ( req->has_protocol() ){
+          if (req->protocol()=="")
+            str += " AND `protocol` IS NULL";
+          else
+            str += " AND `protocol` = ?";
+        }
 
-				st = *_sql <<str;
+        st = *_sql <<str;
 
-				if ( req->has_id() )
-					st <<req->id();
-				if ( req->has_min_peerips() )
-					st <<req->min_peerips();
-				if ( req->max_peerips()!="")
-					st <<req->max_peerips();
-				if ( req->ip()!="")
-					st <<req->ip();
-				if ( req->port()!="")
-					st <<req->port();
-				if (req->protocol()!="")
-					st <<req->protocol();
-			}
-			else
-				st = *_sql <<str;
+        if ( req->has_id() )
+          st <<req->id();
+        if ( req->has_min_peerips() )
+          st <<req->min_peerips();
+        if ( req->max_peerips()!="")
+          st <<req->max_peerips();
+        if ( req->ip()!="")
+          st <<req->ip();
+        if ( req->port()!="")
+          st <<req->port();
+        if (req->protocol()!="")
+          st <<req->protocol();
+      }
+      else
+        st = *_sql <<str;
 
-			cppdb::result r = st;
-			bool first = true;
-			while (r.next()){
-				u64 u;
-				string s;
-				cppdb::null_tag_type null_tag;
+      cppdb::result r = st;
+      bool first = true;
+      while (r.next()){
+        u64 u;
+        string s;
+        cppdb::null_tag_type null_tag;
 
-				if (first){
-					cout<<"{";
-					first = false;
-				}
-				else
-					cout<<","<<endl<<"{";
+        if (first){
+          cout<<"{";
+          first = false;
+        }
+        else
+          cout<<","<<endl<<"{";
 
-				r>>u;
-				output_u64("id", u);
-				cout<<",";
+        r>>u;
+        output_u64("id", u);
+        cout<<",";
 
-				if (out_type){
-					output_string("config_type", "port_scan");
-					cout<<",";
-				}
+        if (out_type){
+          output_string("config_type", "port_scan");
+          cout<<",";
+        }
 
-				r>>u;
-				output_u64("min_peerips", u);
-				cout<<",";
+        r>>u;
+        output_u64("min_peerips", u);
+        cout<<",";
 
-				r>>cppdb::into(u,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("max_peerips","");
-				else
-					output_u64("max_peerips", u);
-				cout<<",";
+        r>>cppdb::into(u,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("max_peerips","");
+        else
+          output_u64("max_peerips", u);
+        cout<<",";
 
-				r>>cppdb::into(s,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("ip","");
-				else
-					output_string("ip", s);
-				cout<<",";
+        r>>cppdb::into(s,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("ip","");
+        else
+          output_string("ip", s);
+        cout<<",";
 
-				r>>cppdb::into(u,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("port","");
-				else
-					output_u64("port", u);
-				cout<<",";
+        r>>cppdb::into(u,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("port","");
+        else
+          output_u64("port", u);
+        cout<<",";
 
-				r>>cppdb::into(s,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("protocol","");
-				else
-					output_string("protocol", s);
-				cout<<"}";
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+        r>>cppdb::into(s,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("protocol","");
+        else
+          output_string("protocol", s);
+        cout<<"}";
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessConfigIPScan(bool out_type){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:{
-			cppdb::statement st = *_sql << "INSERT INTO `t_event_config_ip_scan`(`min_peerports`, `max_peerports`, `sip`, `dip`, `protocol`) VALUES (?,?,?,?,?)";
-			try{
-				st << req->min_peerports();
-				if ( req->max_peerports()=="" )
-					st << cppdb::null;
-				else
-					st << req->max_peerports();
-				if ( req->sip()=="" )
-					st << cppdb::null;
-				else
-					st << req->sip();
-				if ( req->dip()=="" )
-					st << cppdb::null;
-				else
-					st << req->dip();
-				if ( req->protocol()=="" )
-					st << cppdb::null;
-				else
-					st << req->protocol();
-				st << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+  switch (_op){
+    case ADD:{
+      cppdb::statement st = *_sql << "INSERT INTO `t_event_config_ip_scan`(`min_peerports`, `max_peerports`, `sip`, `dip`, `protocol`) VALUES (?,?,?,?,?)";
+      try{
+        st << req->min_peerports();
+        if ( req->max_peerports()=="" )
+          st << cppdb::null;
+        else
+          st << req->max_peerports();
+        if ( req->sip()=="" )
+          st << cppdb::null;
+        else
+          st << req->sip();
+        if ( req->dip()=="" )
+          st << cppdb::null;
+        else
+          st << req->dip();
+        if ( req->protocol()=="" )
+          st << cppdb::null;
+        else
+          st << req->protocol();
+        st << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed("\"id\": "+to_string(st.last_insert_id()));
-			break;
-		}
-		case DEL:{
-			cppdb::statement st = *_sql << "DELETE FROM `t_event_config_ip_scan` WHERE `id` = ?;";
-			try{
-				st << req->id() << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed("\"id\": "+to_string(st.last_insert_id()));
+      break;
+    }
+    case DEL:{
+      cppdb::statement st = *_sql << "DELETE FROM `t_event_config_ip_scan` WHERE `id` = ?;";
+      try{
+        st << req->id() << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed();
-			break;
-		}
-		case MOD:{
-			string str = "UPDATE `t_event_config_ip_scan` SET ";
-			if (req->has_min_peerports())
-				stAddUpdateSet(str, "`min_peerports` = ?");
-			if (req->has_max_peerports())
-				stAddUpdateSet(str, "`max_peerports` = ?");
-			if (req->has_sip())
-				stAddUpdateSet(str, "`sip` = ?");
-			if (req->has_dip())
-				stAddUpdateSet(str, "`dip` = ?");
-			if (req->has_protocol())
-				stAddUpdateSet(str, "`protocol` = ?");
-			str+=" WHERE id = ?";
-			try{
-				cppdb::statement st = *_sql <<str;
-				if (req->has_min_peerports())
-					st << req->min_peerports();
-				if (req->has_max_peerports()){
-					if (req->max_peerports()=="")
-						st << cppdb::null;
-					else
-						st << atol(req->max_peerports().c_str());
-				}
-				if (req->has_sip()){
-					if (req->sip()=="")
-						st << cppdb::null;
-					else
-						st << req->sip();
-				}
-				if (req->has_dip()){
-					if (req->dip()=="")
-						st << cppdb::null;
-					else
-						st << req->dip();
-				}
-				if (req->has_protocol()){
-					if (req->protocol()=="")
-						st << cppdb::null;
-					else
-						st << req->protocol();
-				}
-				st<<req->id();
-				st<<cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed();
+      break;
+    }
+    case MOD:{
+      string str = "UPDATE `t_event_config_ip_scan` SET ";
+      if (req->has_min_peerports())
+        stAddUpdateSet(str, "`min_peerports` = ?");
+      if (req->has_max_peerports())
+        stAddUpdateSet(str, "`max_peerports` = ?");
+      if (req->has_sip())
+        stAddUpdateSet(str, "`sip` = ?");
+      if (req->has_dip())
+        stAddUpdateSet(str, "`dip` = ?");
+      if (req->has_protocol())
+        stAddUpdateSet(str, "`protocol` = ?");
+      str+=" WHERE id = ?";
+      try{
+        cppdb::statement st = *_sql <<str;
+        if (req->has_min_peerports())
+          st << req->min_peerports();
+        if (req->has_max_peerports()){
+          if (req->max_peerports()=="")
+            st << cppdb::null;
+          else
+            st << atol(req->max_peerports().c_str());
+        }
+        if (req->has_sip()){
+          if (req->sip()=="")
+            st << cppdb::null;
+          else
+            st << req->sip();
+        }
+        if (req->has_dip()){
+          if (req->dip()=="")
+            st << cppdb::null;
+          else
+            st << req->dip();
+        }
+        if (req->has_protocol()){
+          if (req->protocol()=="")
+            st << cppdb::null;
+          else
+            st << req->protocol();
+        }
+        st<<req->id();
+        st<<cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed();
-			break;
-		}
-		case GET:{
-			cppdb::statement st;
-			string str = "SELECT `id`, `min_peerports`, `max_peerports`, `sip`, `dip`, `protocol` FROM `t_event_config_ip_scan` WHERE 1";
+      return Executed();
+      break;
+    }
+    case GET:{
+      cppdb::statement st;
+      string str = "SELECT `id`, `min_peerports`, `max_peerports`, `sip`, `dip`, `protocol` FROM `t_event_config_ip_scan` WHERE 1";
 
-			if ( req!=NULL ){
-				if ( req->has_id() )
-					str += " AND `id` = ?";
-				if ( req->has_min_peerports() )
-					str += " AND `min_peerports` = ?";
-				if ( req->has_max_peerports() ){
-					if (req->max_peerports()=="")
-						str += " AND `max_peerports` IS NULL";
-					else
-						str += " AND `max_peerports` = ?";
-				}
-				if ( req->has_sip() ){
-					if (req->sip()=="")
-						str += " AND `sip` IS NULL";
-					else
-						str += " AND `sip` = ?";
-				}
-				if ( req->has_dip() ){
-					if (req->dip()=="")
-						str += " AND `dip` IS NULL";
-					else
-						str += " AND `dip` = ?";
-				}
-				if ( req->has_protocol() ){
-					if (req->protocol()=="")
-						str += " AND `protocol` IS NULL";
-					else
-						str += " AND `protocol` = ?";
-				}
+      if ( req!=NULL ){
+        if ( req->has_id() )
+          str += " AND `id` = ?";
+        if ( req->has_min_peerports() )
+          str += " AND `min_peerports` = ?";
+        if ( req->has_max_peerports() ){
+          if (req->max_peerports()=="")
+            str += " AND `max_peerports` IS NULL";
+          else
+            str += " AND `max_peerports` = ?";
+        }
+        if ( req->has_sip() ){
+          if (req->sip()=="")
+            str += " AND `sip` IS NULL";
+          else
+            str += " AND `sip` = ?";
+        }
+        if ( req->has_dip() ){
+          if (req->dip()=="")
+            str += " AND `dip` IS NULL";
+          else
+            str += " AND `dip` = ?";
+        }
+        if ( req->has_protocol() ){
+          if (req->protocol()=="")
+            str += " AND `protocol` IS NULL";
+          else
+            str += " AND `protocol` = ?";
+        }
 
-				st = *_sql <<str;
+        st = *_sql <<str;
 
-				if ( req->has_id() )
-					st <<req->id();
-				if ( req->has_min_peerports() )
-					st <<req->min_peerports();
-				if ( req->max_peerports()!="")
-					st <<req->max_peerports();
-				if ( req->sip()!="")
-					st <<req->sip();
-				if ( req->dip()!="")
-					st <<req->dip();
-				if (req->protocol()!="")
-					st <<req->protocol();
-			}
-			else
-				st = *_sql <<str;
+        if ( req->has_id() )
+          st <<req->id();
+        if ( req->has_min_peerports() )
+          st <<req->min_peerports();
+        if ( req->max_peerports()!="")
+          st <<req->max_peerports();
+        if ( req->sip()!="")
+          st <<req->sip();
+        if ( req->dip()!="")
+          st <<req->dip();
+        if (req->protocol()!="")
+          st <<req->protocol();
+      }
+      else
+        st = *_sql <<str;
 
-			cppdb::result r = st;
-			bool first = true;
-			while (r.next()){
-				u64 u;
-				string s;
-				cppdb::null_tag_type null_tag;
+      cppdb::result r = st;
+      bool first = true;
+      while (r.next()){
+        u64 u;
+        string s;
+        cppdb::null_tag_type null_tag;
 
-				if (first){
-					cout<<"{";
-					first = false;
-				}
-				else
-					cout<<","<<endl<<"{";
+        if (first){
+          cout<<"{";
+          first = false;
+        }
+        else
+          cout<<","<<endl<<"{";
 
-				r>>u;
-				output_u64("id", u);
-				cout<<",";
+        r>>u;
+        output_u64("id", u);
+        cout<<",";
 
-				if (out_type){
-					output_string("config_type", "ip_scan");
-					cout<<",";
-				}
+        if (out_type){
+          output_string("config_type", "ip_scan");
+          cout<<",";
+        }
 
-				r>>u;
-				output_u64("min_peerports", u);
-				cout<<",";
+        r>>u;
+        output_u64("min_peerports", u);
+        cout<<",";
 
-				r>>cppdb::into(u,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("max_peerports","");
-				else
-					output_u64("max_peerports", u);
-				cout<<",";
+        r>>cppdb::into(u,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("max_peerports","");
+        else
+          output_u64("max_peerports", u);
+        cout<<",";
 
-				r>>cppdb::into(s,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("sip","");
-				else
-					output_string("sip", s);
-				cout<<",";
+        r>>cppdb::into(s,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("sip","");
+        else
+          output_string("sip", s);
+        cout<<",";
 
-				r>>cppdb::into(s,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("dip","");
-				else
-					output_string("dip", s);
-				cout<<",";
+        r>>cppdb::into(s,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("dip","");
+        else
+          output_string("dip", s);
+        cout<<",";
 
-				r>>cppdb::into(s,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("protocol","");
-				else
-					output_string("protocol", s);
-				cout<<"}";
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+        r>>cppdb::into(s,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("protocol","");
+        else
+          output_string("protocol", s);
+        cout<<"}";
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessConfigSrv(bool out_type){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:{
-			cppdb::statement st = *_sql << "INSERT INTO `t_event_config_srv`(`min_portsessions`, `max_portsessions`, `ip`, `port`, `protocol`) VALUES (?,?,?,?,?)";
-			try{
-				st << req->min_portsessions();
-				if ( req->max_portsessions()=="" )
-					st << cppdb::null;
-				else
-					st << req->max_portsessions();
-				st << req->ip();
-				if ( req->port()=="" )
-					st << cppdb::null;
-				else
-					st << req->port();
-				if ( req->protocol()=="" )
-					st << cppdb::null;
-				else
-					st << req->protocol();
-				st << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+  switch (_op){
+    case ADD:{
+      cppdb::statement st = *_sql << "INSERT INTO `t_event_config_srv`(`min_portsessions`, `max_portsessions`, `ip`, `port`, `protocol`) VALUES (?,?,?,?,?)";
+      try{
+        st << req->min_portsessions();
+        if ( req->max_portsessions()=="" )
+          st << cppdb::null;
+        else
+          st << req->max_portsessions();
+        st << req->ip();
+        if ( req->port()=="" )
+          st << cppdb::null;
+        else
+          st << req->port();
+        if ( req->protocol()=="" )
+          st << cppdb::null;
+        else
+          st << req->protocol();
+        st << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed("\"id\": "+to_string(st.last_insert_id()));
-			break;
-		}
-		case DEL:{
-			cppdb::statement st = *_sql << "DELETE FROM `t_event_config_srv` WHERE `id` = ?;";
-			try{
-				st << req->id() << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed("\"id\": "+to_string(st.last_insert_id()));
+      break;
+    }
+    case DEL:{
+      cppdb::statement st = *_sql << "DELETE FROM `t_event_config_srv` WHERE `id` = ?;";
+      try{
+        st << req->id() << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed();
-			break;
-		}
-		case MOD:{
-			string str = "UPDATE `t_event_config_srv` SET ";
-			if (req->has_min_portsessions())
-				stAddUpdateSet(str, "`min_portsessions` = ?");
-			if (req->has_max_portsessions())
-				stAddUpdateSet(str, "`max_portsessions` = ?");
-			if (req->has_ip())
-				stAddUpdateSet(str, "`ip` = ?");
-			if (req->has_port())
-				stAddUpdateSet(str, "`port` = ?");
-			if (req->has_protocol())
-				stAddUpdateSet(str, "`protocol` = ?");
-			str+=" WHERE id = ?";
-			try{
-				cppdb::statement st = *_sql <<str;
-				if (req->has_min_portsessions())
-					st << req->min_portsessions();
-				if (req->has_max_portsessions()){
-					if (req->max_portsessions()=="")
-						st << cppdb::null;
-					else
-						st << req->max_portsessions();
-				}
-				if (req->has_ip())
-					st << req->ip();
-				if (req->has_port()){
-					if (req->port()=="")
-						st << cppdb::null;
-					else
-						st << req->port();
-				}
-				if (req->has_protocol()){
-					if (req->protocol()=="")
-						st << cppdb::null;
-					else
-						st << req->protocol();
-				}
-				st<<req->id();
-				st<<cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed();
+      break;
+    }
+    case MOD:{
+      string str = "UPDATE `t_event_config_srv` SET ";
+      if (req->has_min_portsessions())
+        stAddUpdateSet(str, "`min_portsessions` = ?");
+      if (req->has_max_portsessions())
+        stAddUpdateSet(str, "`max_portsessions` = ?");
+      if (req->has_ip())
+        stAddUpdateSet(str, "`ip` = ?");
+      if (req->has_port())
+        stAddUpdateSet(str, "`port` = ?");
+      if (req->has_protocol())
+        stAddUpdateSet(str, "`protocol` = ?");
+      str+=" WHERE id = ?";
+      try{
+        cppdb::statement st = *_sql <<str;
+        if (req->has_min_portsessions())
+          st << req->min_portsessions();
+        if (req->has_max_portsessions()){
+          if (req->max_portsessions()=="")
+            st << cppdb::null;
+          else
+            st << req->max_portsessions();
+        }
+        if (req->has_ip())
+          st << req->ip();
+        if (req->has_port()){
+          if (req->port()=="")
+            st << cppdb::null;
+          else
+            st << req->port();
+        }
+        if (req->has_protocol()){
+          if (req->protocol()=="")
+            st << cppdb::null;
+          else
+            st << req->protocol();
+        }
+        st<<req->id();
+        st<<cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			system("/Server/bin/config_pusher >> /dev/null 2>&1");
+      system("/Server/bin/config_pusher >> /dev/null 2>&1");
 
-			return Executed();
-			break;
-		}
-		case GET:{
-			cppdb::statement st;
-			string str = "SELECT `id`, `min_portsessions`, `max_portsessions`, `ip`, `port`, `protocol` FROM `t_event_config_srv` WHERE 1";
+      return Executed();
+      break;
+    }
+    case GET:{
+      cppdb::statement st;
+      string str = "SELECT `id`, `min_portsessions`, `max_portsessions`, `ip`, `port`, `protocol` FROM `t_event_config_srv` WHERE 1";
 
-			if ( req!=NULL ){
-				if ( req->has_id() )
-					str += " AND `id` = ?";
-				if ( req->has_min_portsessions() )
-					str += " AND `min_portsessions` = ?";
-				if ( req->has_max_portsessions() ){
-					if (req->max_portsessions()=="")
-						str += " AND `max_portsessions` IS NULL";
-					else
-						str += " AND `max_portsessions` = ?";
-				}
-				if ( req->has_ip() )
-					str += " AND `ip` = ?";
-				if ( req->has_port() ){
-					if (req->port()=="")
-						str += " AND `port` IS NULL";
-					else
-						str += " AND `port` = ?";
-				}
-				if ( req->has_protocol() ){
-					if (req->protocol()=="")
-						str += " AND `protocol` IS NULL";
-					else
-						str += " AND `protocol` = ?";
-				}
+      if ( req!=NULL ){
+        if ( req->has_id() )
+          str += " AND `id` = ?";
+        if ( req->has_min_portsessions() )
+          str += " AND `min_portsessions` = ?";
+        if ( req->has_max_portsessions() ){
+          if (req->max_portsessions()=="")
+            str += " AND `max_portsessions` IS NULL";
+          else
+            str += " AND `max_portsessions` = ?";
+        }
+        if ( req->has_ip() )
+          str += " AND `ip` = ?";
+        if ( req->has_port() ){
+          if (req->port()=="")
+            str += " AND `port` IS NULL";
+          else
+            str += " AND `port` = ?";
+        }
+        if ( req->has_protocol() ){
+          if (req->protocol()=="")
+            str += " AND `protocol` IS NULL";
+          else
+            str += " AND `protocol` = ?";
+        }
 
-				st = *_sql <<str;
+        st = *_sql <<str;
 
-				if ( req->has_id() )
-					st <<req->id();
-				if ( req->has_min_portsessions() )
-					st <<req->min_portsessions();
-				if ( req->max_portsessions()!="" )
-					st <<req->max_portsessions();
-				if ( req->has_ip() )
-					st <<req->ip();
-				if ( req->port()!="")
-					st <<req->port();
-				if (req->protocol()!="")
-					st <<req->protocol();
-			}
-			else
-				st = *_sql <<str;
+        if ( req->has_id() )
+          st <<req->id();
+        if ( req->has_min_portsessions() )
+          st <<req->min_portsessions();
+        if ( req->max_portsessions()!="" )
+          st <<req->max_portsessions();
+        if ( req->has_ip() )
+          st <<req->ip();
+        if ( req->port()!="")
+          st <<req->port();
+        if (req->protocol()!="")
+          st <<req->protocol();
+      }
+      else
+        st = *_sql <<str;
 
-			cppdb::result r = st;
-			bool first = true;
-			while (r.next()){
-				u64 u;
-				string s;
-				cppdb::null_tag_type null_tag;
+      cppdb::result r = st;
+      bool first = true;
+      while (r.next()){
+        u64 u;
+        string s;
+        cppdb::null_tag_type null_tag;
 
-				if (first){
-					cout<<"{";
-					first = false;
-				}
-				else
-					cout<<","<<endl<<"{";
+        if (first){
+          cout<<"{";
+          first = false;
+        }
+        else
+          cout<<","<<endl<<"{";
 
-				r>>u;
-				output_u64("id", u);
-				cout<<",";
+        r>>u;
+        output_u64("id", u);
+        cout<<",";
 
-				if (out_type){
-					output_string("config_type", "srv");
-					cout<<",";
-				}
+        if (out_type){
+          output_string("config_type", "srv");
+          cout<<",";
+        }
 
-				r>>u;
-				output_u64("min_portsessions", u);
-				cout<<",";
+        r>>u;
+        output_u64("min_portsessions", u);
+        cout<<",";
 
-				r>>cppdb::into(u,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("max_portsessions","");
-				else
-					output_u64("max_portsessions", u);
-				cout<<",";
+        r>>cppdb::into(u,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("max_portsessions","");
+        else
+          output_u64("max_portsessions", u);
+        cout<<",";
 
-				r>>s;
-				output_string("ip", s);
-				cout<<",";
+        r>>s;
+        output_string("ip", s);
+        cout<<",";
 
-				r>>cppdb::into(u,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("port","");
-				else
-					output_u64("port", u);
-				cout<<",";
+        r>>cppdb::into(u,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("port","");
+        else
+          output_u64("port", u);
+        cout<<",";
 
-				r>>cppdb::into(s,null_tag);
-				if (null_tag==cppdb::null_value)
-					output_string("protocol","");
-				else
-					output_string("protocol", s);
-				cout<<"}";
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+        r>>cppdb::into(s,null_tag);
+        if (null_tag==cppdb::null_value)
+          output_string("protocol","");
+        else
+          output_string("protocol", s);
+        cout<<"}";
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessLevel(){
-	EventLevel *req = (EventLevel *)this->_req;
+  EventLevel *req = (EventLevel *)this->_req;
 
-	switch (_op){
-		case ADD:
-			return false;
-			break;
-		case DEL:
-			return false;
-			break;
-		case MOD:
-			return false;
-			break;
+  switch (_op){
+    case ADD:
+      return false;
+      break;
+    case DEL:
+      return false;
+      break;
+    case MOD:
+      return false;
+      break;
 
-		case GET:{
-			string str = "SELECT `id`, `desc`, `profile` FROM `t_event_level` WHERE 1";
+    case GET:{
+      string str = "SELECT `id`, `desc`, `profile` FROM `t_event_level` WHERE 1";
 
-			if ( req->has_id() )
-				str += " AND `id` = ?";
-			if ( req->has_desc() )
-				str += " AND `desc` = ?";
-			if ( req->has_profile() )
-				str += " AND `profile` = ?";
+      if ( req->has_id() )
+        str += " AND `id` = ?";
+      if ( req->has_desc() )
+        str += " AND `desc` = ?";
+      if ( req->has_profile() )
+        str += " AND `profile` = ?";
 
-			cppdb::statement st = *_sql <<str;
+      cppdb::statement st = *_sql <<str;
 
-			if ( req->has_id() )
-				st <<req->id();
-			if ( req->has_desc() )
-				st <<req->desc();
-			if ( req->has_profile() )
-				st <<req->profile();
+      if ( req->has_id() )
+        st <<req->id();
+      if ( req->has_desc() )
+        st <<req->desc();
+      if ( req->has_profile() )
+        st <<req->profile();
 
-			cppdb::result r = st;
-			bool first = true;
-			while (r.next()){
-				u64 id;
-				string desc, profile;
+      cppdb::result r = st;
+      bool first = true;
+      while (r.next()){
+        u64 id;
+        string desc, profile;
 
-				if (first){
-					cout<<"{";
-					first = false;
-				}
-				else
-					cout<<","<<endl<<"{";
+        if (first){
+          cout<<"{";
+          first = false;
+        }
+        else
+          cout<<","<<endl<<"{";
 
-				r>>id>>desc>>profile;
-				output_u64("id", id);
-				cout<<",";
-				output_string("desc", desc);
-				cout<<",";
-				output_string("profile", profile);
-				cout<<"}";
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+        r>>id>>desc>>profile;
+        output_u64("id", id);
+        cout<<",";
+        output_string("desc", desc);
+        cout<<",";
+        output_string("profile", profile);
+        cout<<"}";
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessAction(){
-	EventAction *req = (EventAction *)this->_req;
+  EventAction *req = (EventAction *)this->_req;
 
-	switch (_op){
-		case ADD:{
-			cppdb::statement st = *_sql << "INSERT INTO `t_event_action`(`act`, `mail`, `phone`, `uid`, `desc`) VALUES (?,?,?,?,?)";
-			try{
-				st << req->act() << req->mail() << req->phone() << req->uid() << req->desc();
-				st << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+  switch (_op){
+    case ADD:{
+      cppdb::statement st = *_sql << "INSERT INTO `t_event_action`(`act`, `mail`, `phone`, `uid`, `desc`) VALUES (?,?,?,?,?)";
+      try{
+        st << req->act() << req->mail() << req->phone() << req->uid() << req->desc();
+        st << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			return Executed("\"id\": "+to_string(st.last_insert_id()));
-			break;
-		}
-		case DEL:{
-			cppdb::statement st = *_sql << "DELETE FROM `t_event_action` WHERE `id` = ?;";
-			try{
-				st << req->action_id() << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed("\"id\": "+to_string(st.last_insert_id()));
+      break;
+    }
+    case DEL:{
+      cppdb::statement st = *_sql << "DELETE FROM `t_event_action` WHERE `id` = ?;";
+      try{
+        st << req->action_id() << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			return Executed();
-			break;
-		}
-		case MOD:{
-			string str = "UPDATE `t_event_action` SET ";
-			if (req->has_act())
-				stAddUpdateSet(str, "`act` = ?");
-			if (req->has_mail())
-				stAddUpdateSet(str, "`mail` = ?");
-			if (req->has_phone())
-				stAddUpdateSet(str, "`phone` = ?");
-			if (req->has_uid())
-				stAddUpdateSet(str, "`uid` = ?");
-			if (req->has_desc())
-				stAddUpdateSet(str, "`desc` = ?");
-			str+=" WHERE id = ?";
-			try{
-				cppdb::statement st = *_sql <<str;
-				if (req->has_act())
-					st << req->act();
-				if (req->has_mail())
-					st << req->mail();
-				if (req->has_phone())
-					st << req->phone();
-				if (req->has_uid())
-					st << req->uid();
-				if (req->has_desc())
-					st << req->desc();
-				st<<req->action_id();
-				st<<cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed();
+      break;
+    }
+    case MOD:{
+      string str = "UPDATE `t_event_action` SET ";
+      if (req->has_act())
+        stAddUpdateSet(str, "`act` = ?");
+      if (req->has_mail())
+        stAddUpdateSet(str, "`mail` = ?");
+      if (req->has_phone())
+        stAddUpdateSet(str, "`phone` = ?");
+      if (req->has_uid())
+        stAddUpdateSet(str, "`uid` = ?");
+      if (req->has_desc())
+        stAddUpdateSet(str, "`desc` = ?");
+      str+=" WHERE id = ?";
+      try{
+        cppdb::statement st = *_sql <<str;
+        if (req->has_act())
+          st << req->act();
+        if (req->has_mail())
+          st << req->mail();
+        if (req->has_phone())
+          st << req->phone();
+        if (req->has_uid())
+          st << req->uid();
+        if (req->has_desc())
+          st << req->desc();
+        st<<req->action_id();
+        st<<cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			return Executed();
-			break;
-		}
-		case GET:{
-			string str = "SELECT `id`, `act`, `mail`, `phone`, `uid`, `desc` FROM `t_event_action` WHERE 1";
+      return Executed();
+      break;
+    }
+    case GET:{
+      string str = "SELECT `id`, `act`, `mail`, `phone`, `uid`, `desc` FROM `t_event_action` WHERE 1";
 
-			if ( req->has_action_id() )
-				str += " AND `id` = ?";
-			if ( req->has_act() )
-				str += " AND `act` = ?";
-			if ( req->has_mail() )
-				str += " AND `mail` = ?";
-			if ( req->has_phone() )
-				str += " AND `phone` = ?";
-			if ( req->has_uid() )
-				str += " AND `uid` = ?";
-			if ( req->has_desc() )
-				str += " AND `desc` = ?";
+      if ( req->has_action_id() )
+        str += " AND `id` = ?";
+      if ( req->has_act() )
+        str += " AND `act` = ?";
+      if ( req->has_mail() )
+        str += " AND `mail` = ?";
+      if ( req->has_phone() )
+        str += " AND `phone` = ?";
+      if ( req->has_uid() )
+        str += " AND `uid` = ?";
+      if ( req->has_desc() )
+        str += " AND `desc` = ?";
 
-			cppdb::statement st = *_sql <<str;
+      cppdb::statement st = *_sql <<str;
 
-			if ( req->has_action_id() )
-				st <<req->action_id();
-			if ( req->has_act() )
-				st <<req->act();
-			if ( req->has_mail() )
-				st <<req->mail();
-			if ( req->has_phone() )
-				st <<req->phone();
-			if ( req->has_uid() )
-				st <<req->uid();
-			if ( req->has_desc() )
-				st <<req->desc();
+      if ( req->has_action_id() )
+        st <<req->action_id();
+      if ( req->has_act() )
+        st <<req->act();
+      if ( req->has_mail() )
+        st <<req->mail();
+      if ( req->has_phone() )
+        st <<req->phone();
+      if ( req->has_uid() )
+        st <<req->uid();
+      if ( req->has_desc() )
+        st <<req->desc();
 
-			cppdb::result r = st;
-			bool first = true;
-			while (r.next()){
-				u64 u;
-				string s;
+      cppdb::result r = st;
+      bool first = true;
+      while (r.next()){
+        u64 u;
+        string s;
 
-				if (first){
-					cout<<"{";
-					first = false;
-				}
-				else
-					cout<<","<<endl<<"{";
+        if (first){
+          cout<<"{";
+          first = false;
+        }
+        else
+          cout<<","<<endl<<"{";
 
-				r>>u;
-				output_u64("id", u);
-				cout<<",";
+        r>>u;
+        output_u64("id", u);
+        cout<<",";
 
-				r>>u;
-				output_u64("act", u);
-				cout<<",";
+        r>>u;
+        output_u64("act", u);
+        cout<<",";
 
-				r>>s;
-				output_string("mail", s);
-				cout<<",";
+        r>>s;
+        output_string("mail", s);
+        cout<<",";
 
-				r>>s;
-				output_string("phone", s);
-				cout<<",";
+        r>>s;
+        output_string("phone", s);
+        cout<<",";
 
-				r>>s;
-				output_string("uid", s);
-				cout<<",";
+        r>>s;
+        output_string("uid", s);
+        cout<<",";
 
-				r>>s;
-				output_string("desc", s);
-				cout<<"}";
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+        r>>s;
+        output_string("desc", s);
+        cout<<"}";
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessConfigAll(){
-	if(!this->ProcessConfigThreshold(true))
-		return false;
-	cout<<","<<endl;
-	if(!this->ProcessConfigSrv(true))
-		return false;
-	cout<<","<<endl;
-	if(!this->ProcessConfigPortScan(true))
-		return false;
+  if(!this->ProcessConfigThreshold(true))
+    return false;
+  cout<<","<<endl;
+  if(!this->ProcessConfigSrv(true))
+    return false;
+  cout<<","<<endl;
+  if(!this->ProcessConfigPortScan(true))
+    return false;
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessDataAggre(){
-	EventDataAggre* tmp_req = (EventDataAggre *)this->_req;
-	EventDataAggre& req = *tmp_req;
-	ostream& output = cout;
+  EventDataAggre* tmp_req = (EventDataAggre *)this->_req;
+  EventDataAggre& req = *tmp_req;
+  ostream& output = cout;
 
-	switch (_op){
-		case ADD:
-			return false;
-			break;
-		case DEL:
-			return false;
-			break;
-		case MOD:
-			return false;
-			break;
+  switch (_op){
+    case ADD:
+      return false;
+      break;
+    case DEL:
+      return false;
+      break;
+    case MOD:
+      return false;
+      break;
 
-		case GET:{
-			string str = "SELECT `id`, `event_id`, `devid`, `obj`, `type`, `level`, `alarm_peak`, `sub_events`, `alarm_avg`, `value_type`, `desc`, `duration`, `starttime`, `endtime`, `is_alive` "
-			             "FROM `t_event_data_aggre` WHERE ( ";
-			stAddWhere(str,"`starttime` >= ?");
-			stAddWhere(str,"`endtime` <= ?");
-			if (req.has_id())
-			  stAddWhere(str,"`id` = ?");
-			if (req.has_type())
-			  stAddWhere(str,"`type` = ?");
-			if (req.has_devid())
-			  stAddWhere(str,"`devid` = ?");
-			if (req.has_event_id())
-			  stAddWhere(str,"`event_id` = ?");
-			if (req.has_obj())
-			  stAddWhere(str,"`obj` LIKE ?");
-			if (req.has_level())
-			  stAddWhere(str,"`level` = ?");
-			str += " ) ORDER BY `starttime`";
+    case GET:{
+      string str = "SELECT `id`, `event_id`, `devid`, `obj`, `type`, `level`, `alarm_peak`, `sub_events`, `alarm_avg`, `value_type`, `desc`, `duration`, `starttime`, `endtime`, `is_alive` "
+                   "FROM `t_event_data_aggre` WHERE ( ";
+      stAddWhere(str,"`starttime` >= ?");
+      stAddWhere(str,"`endtime` <= ?");
+      if (req.has_id())
+        stAddWhere(str,"`id` = ?");
+      if (req.has_type())
+        stAddWhere(str,"`type` = ?");
+      if (req.has_devid())
+        stAddWhere(str,"`devid` = ?");
+      if (req.has_event_id())
+        stAddWhere(str,"`event_id` = ?");
+      if (req.has_obj())
+        stAddWhere(str,"`obj` LIKE ?");
+      if (req.has_level())
+        stAddWhere(str,"`level` = ?");
+      str += " ) ORDER BY `starttime`";
 
-			cppdb::statement st = *_sql <<str;
-			st<<req.starttime()<<req.endtime();
-			if (req.has_id())
-			  st<<req.id();
-			if (req.has_type())
-			  st<<req.type();
-			if (req.has_devid())
-			  st<<req.devid();
-			if (req.has_event_id())
-			  st<<req.event_id();
-			if (req.has_obj())
-			  st<<"%"+req.obj()+"%";
-			if (req.has_level())
-			  st<<req.level();
+      cppdb::statement st = *_sql <<str;
+      st<<req.starttime()<<req.endtime();
+      if (req.has_id())
+        st<<req.id();
+      if (req.has_type())
+        st<<req.type();
+      if (req.has_devid())
+        st<<req.devid();
+      if (req.has_event_id())
+        st<<req.event_id();
+      if (req.has_obj())
+        st<<"%"+req.obj()+"%";
+      if (req.has_level())
+        st<<req.level();
 
-			try{
-			  cppdb::result r = st;
-			  string s;
-			  u32 u;
-			  bool first = true;
+      try{
+        cppdb::result r = st;
+        string s;
+        u32 u;
+        bool first = true;
 
-			  while(r.next()){
-			    if (first)
-			      first=false;
-			    else
-			      output<<","<<endl;
+        while(r.next()){
+          if (first)
+            first=false;
+          else
+            output<<","<<endl;
 
-			    output<<"{";
+          output<<"{";
 
-			    r>>u;
-			    output_u64("id", u);
-			    output<<',';
+          r>>u;
+          output_u64("id", u);
+          output<<',';
 
-			    r>>u;
-			    output_u64("event_id", u);
-			    output<<',';
+          r>>u;
+          output_u64("event_id", u);
+          output<<',';
 
-			    r>>u;
-			    output_u64("devid", u);
-			    output<<',';
+          r>>u;
+          output_u64("devid", u);
+          output<<',';
 
-			    r>>s;
-			    output_string("obj", s);
-			    output<<',';
+          r>>s;
+          output_string("obj", s);
+          output<<',';
 
-			    r>>s;
-			    output_string("type", s);
-			    output<<',';
+          r>>s;
+          output_string("type", s);
+          output<<',';
 
-			    r>>s;
-			    output_string("level", s);
-			    output<<',';
+          r>>s;
+          output_string("level", s);
+          output<<',';
 
-			    r>>u;
-			    output_u64("alarm_peak", u);
-			    output<<',';
+          r>>u;
+          output_u64("alarm_peak", u);
+          output<<',';
 
-			    r>>u;
-			    output_u64("sub_events", u);
-			    output<<',';
+          r>>u;
+          output_u64("sub_events", u);
+          output<<',';
 
-			    r>>u;
-			    output_u64("alarm_avg", u);
-			    output<<',';
+          r>>u;
+          output_u64("alarm_avg", u);
+          output<<',';
 
-			    r>>s;
-			    output_string("value_type", s);
-			    output<<',';
+          r>>s;
+          output_string("value_type", s);
+          output<<',';
 
-			    r>>s;
-			    output_string("desc", s);
-			    output<<',';
+          r>>s;
+          output_string("desc", s);
+          output<<',';
 
-			    r>>u;
-			    output_u64("duration", u);
-			    output<<',';
+          r>>u;
+          output_u64("duration", u);
+          output<<',';
 
-			    r>>u;
-			    output_u64("starttime", u);
-			    output<<',';
+          r>>u;
+          output_u64("starttime", u);
+          output<<',';
 
-			    r>>u;
-			    output_u64("endtime", u);
-			    output<<',';
+          r>>u;
+          output_u64("endtime", u);
+          output<<',';
 
-			    r>>u;
-			    output_u64("is_alive", u);
-			    output<<"}";
-			  }
-			} catch ( cppdb::cppdb_error const &e ){
-			  log_err("%s", e.what());
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+          r>>u;
+          output_u64("is_alive", u);
+          output<<"}";
+        }
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessConfigDnstunAI(bool out_type) {
@@ -3568,12 +3579,12 @@ bool ConfigEvent::ProcessConfigDga(bool out_type){
 }
 
 bool ConfigEvent::ProcessConfigDns(bool out_type){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:{
-			cppdb::statement st = *_sql << "INSERT INTO `t_event_config_dns`(`ip`, `qname`, `qcount`, `desc`) VALUES (?,?,?,?)";
-			try{
+  switch (_op){
+    case ADD:{
+      cppdb::statement st = *_sql << "INSERT INTO `t_event_config_dns`(`ip`, `qname`, `qcount`, `desc`) VALUES (?,?,?,?)";
+      try{
         if (req->ip().empty())
           st << cppdb::null;
         else
@@ -3584,41 +3595,41 @@ bool ConfigEvent::ProcessConfigDns(bool out_type){
         else
           st << req->qname();
 
-				st << req->qcount() << req->desc();
-				st << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+        st << req->qcount() << req->desc();
+        st << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			return Executed("\"id\": "+to_string(st.last_insert_id()));
-			break;
-		}
-		case DEL:{
-			cppdb::statement st = *_sql << "DELETE FROM `t_event_config_dns` WHERE `id` = ?;";
-			try{
-				st << req->id() << cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+      return Executed("\"id\": "+to_string(st.last_insert_id()));
+      break;
+    }
+    case DEL:{
+      cppdb::statement st = *_sql << "DELETE FROM `t_event_config_dns` WHERE `id` = ?;";
+      try{
+        st << req->id() << cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			return Executed();
-			break;
-		}
-		case MOD:{
-			string str = "UPDATE `t_event_config_dns` SET ";
-			if (req->has_ip())
-				stAddUpdateSet(str, "`ip` = ?");
-			if (req->has_qname())
-				stAddUpdateSet(str, "`qname` = ?");
-			if (req->has_qcount())
-				stAddUpdateSet(str, "`qcount` = ?");
-			if (req->has_desc())
-				stAddUpdateSet(str, "`desc` = ?");
-			str+=" WHERE id = ?";
-			try{
-				cppdb::statement st = *_sql <<str;
+      return Executed();
+      break;
+    }
+    case MOD:{
+      string str = "UPDATE `t_event_config_dns` SET ";
+      if (req->has_ip())
+        stAddUpdateSet(str, "`ip` = ?");
+      if (req->has_qname())
+        stAddUpdateSet(str, "`qname` = ?");
+      if (req->has_qcount())
+        stAddUpdateSet(str, "`qcount` = ?");
+      if (req->has_desc())
+        stAddUpdateSet(str, "`desc` = ?");
+      str+=" WHERE id = ?";
+      try{
+        cppdb::statement st = *_sql <<str;
         if (req->has_ip()) {
           if (req->ip().empty())
             st << cppdb::null;
@@ -3631,110 +3642,110 @@ bool ConfigEvent::ProcessConfigDns(bool out_type){
           else
             st << req->qname();
         }
-				if (req->has_qcount())
-				  st << req->qcount();
-				if (req->has_desc())
-				  st << req->desc();
-	
-				st<<req->id();
-				st<<cppdb::exec;
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
+        if (req->has_qcount())
+          st << req->qcount();
+        if (req->has_desc())
+          st << req->desc();
+  
+        st<<req->id();
+        st<<cppdb::exec;
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
 
-			return Executed();
-			break;
-		}
-		case GET:{
-			cppdb::statement st;
-			string str = "SELECT `id`, `ip`, `qname`, `qcount`, `desc` FROM `t_event_config_dns` WHERE 1";
+      return Executed();
+      break;
+    }
+    case GET:{
+      cppdb::statement st;
+      string str = "SELECT `id`, `ip`, `qname`, `qcount`, `desc` FROM `t_event_config_dns` WHERE 1";
 
-			if ( req!=NULL ){
-				if ( req->has_id() )
-					str += " AND `id` = ?";
-				if ( req->has_ip() ) {
+      if ( req!=NULL ){
+        if ( req->has_id() )
+          str += " AND `id` = ?";
+        if ( req->has_ip() ) {
           if (req->ip().empty())
-					  str += " AND `ip` IS NULL";
+            str += " AND `ip` IS NULL";
           else
             str += " AND `ip` = ?";
         }
-				if ( req->has_qname() ) {
+        if ( req->has_qname() ) {
           if (req->qname().empty())
             str += " AND `qname` IS NULL";
           else
-					  str += " AND `qname` = ?";
+            str += " AND `qname` = ?";
         }
-				if ( req->has_qcount() )
-					str += " AND `qcount` = ?";
+        if ( req->has_qcount() )
+          str += " AND `qcount` = ?";
         if ( req->has_desc() )
           str += " AND `desc` = ?";
 
-				st = *_sql <<str;
+        st = *_sql <<str;
 
-				if ( req->has_id() )
-					st << req->id();
-				if ( !req->ip().empty() )
-					st << req->ip();
-				if ( !req->qname().empty() )
-					st << req->qname();
-				if ( req->has_qcount() )
-					st << req->qcount();
-				if ( req->has_desc() )
-					st << req->desc();
-			}
-			else
-				st = *_sql <<str;
+        if ( req->has_id() )
+          st << req->id();
+        if ( !req->ip().empty() )
+          st << req->ip();
+        if ( !req->qname().empty() )
+          st << req->qname();
+        if ( req->has_qcount() )
+          st << req->qcount();
+        if ( req->has_desc() )
+          st << req->desc();
+      }
+      else
+        st = *_sql <<str;
 
-			cppdb::result r = st;
-			bool first = true;
-			while (r.next()){
-				u64 u;
-				string s;
-				cppdb::null_tag_type null_tag;
+      cppdb::result r = st;
+      bool first = true;
+      while (r.next()){
+        u64 u;
+        string s;
+        cppdb::null_tag_type null_tag;
 
-				if (first){
-					cout<<"{";
-					first = false;
-				}
-				else
-					cout<<","<<endl<<"{";
+        if (first){
+          cout<<"{";
+          first = false;
+        }
+        else
+          cout<<","<<endl<<"{";
 
-				r>>u;
-				output_u64("id", u);
-				cout<<",";
+        r>>u;
+        output_u64("id", u);
+        cout<<",";
 
-				r>>cppdb::into(s, null_tag);
+        r>>cppdb::into(s, null_tag);
         if (null_tag==cppdb::null_value)
           output_string("ip", "");
         else
-				  output_string("ip", s);
-				cout<<",";
+          output_string("ip", s);
+        cout<<",";
 
-				r>>cppdb::into(s, null_tag);
+        r>>cppdb::into(s, null_tag);
         if (null_tag==cppdb::null_value)
           output_string("qname", "");
         else
-				  output_string("qname", s);
-				cout<<",";
+          output_string("qname", s);
+        cout<<",";
 
-				r>>u;
-				output_u64("qcount", u);
+        r>>u;
+        output_u64("qcount", u);
         cout<<",";
   
         r>>s;
         output_string("desc", s);
 
-				cout<<"}";
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+        cout<<"}";
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ProcessConfigIcmpTun(bool out_type){
@@ -4227,25 +4238,25 @@ bool ConfigEvent::ProcessConfigDnstunnel(bool out_type){
 }
 
 bool ConfigEvent::ParseReqForEvent(cgicc::Cgicc& cgi){
-	Event *req = new Event();
-	this->_req = req;
+  Event *req = new Event();
+  this->_req = req;
 
-	if (!cgi("event_id").empty()) req->set_event_id( atol(cgi("event_id").c_str()) );
-	if (!cgi("desc").empty()) req->set_desc( cgi("desc") );
-	if (!cgi("event_type").empty()) req->set_event_type( cgi("event_type") );
-	if (!cgi("event_level").empty()) req->set_event_level( cgi("event_level") );
-	if (!cgi("status").empty()) req->set_status( cgi("status") );
-	if (!cgi("action_id").empty()) req->set_action_id( cgi("action_id") );
-	if (!cgi("config_id").empty()) req->set_config_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("moid").empty()) req->set_moid( cgi("moid")=="null"?"":cgi("moid") );
-	if (!cgi("devid").empty()) req->set_devid( cgi("devid")=="null"?"":cgi("devid") );
+  if (!cgi("event_id").empty()) req->set_event_id( atol(cgi("event_id").c_str()) );
+  if (!cgi("desc").empty()) req->set_desc( cgi("desc") );
+  if (!cgi("event_type").empty()) req->set_event_type( cgi("event_type") );
+  if (!cgi("event_level").empty()) req->set_event_level( cgi("event_level") );
+  if (!cgi("status").empty()) req->set_status( cgi("status") );
+  if (!cgi("action_id").empty()) req->set_action_id( cgi("action_id") );
+  if (!cgi("config_id").empty()) req->set_config_id( atol(cgi("config_id").c_str()) );
+  if (!cgi("moid").empty()) req->set_moid( cgi("moid")=="null"?"":cgi("moid") );
+  if (!cgi("devid").empty()) req->set_devid( cgi("devid")=="null"?"":cgi("devid") );
 
-	if (!cgi("weekday").empty()) req->set_weekday( cgi("weekday")=="null"?"":cgi("weekday") );
-	if (!cgi("stime").empty()) req->set_stime( cgi("stime") );
-	if (!cgi("etime").empty()) req->set_etime( cgi("etime") );
-	if (!cgi("coverrange").empty()) req->set_coverrange( cgi("coverrange") );
+  if (!cgi("weekday").empty()) req->set_weekday( cgi("weekday")=="null"?"":cgi("weekday") );
+  if (!cgi("stime").empty()) req->set_stime( cgi("stime") );
+  if (!cgi("etime").empty()) req->set_etime( cgi("etime") );
+  if (!cgi("coverrange").empty()) req->set_coverrange( cgi("coverrange") );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForEventIgnore(cgicc::Cgicc& cgi){
@@ -4270,13 +4281,13 @@ bool ConfigEvent::ParseReqForEventIgnore(cgicc::Cgicc& cgi){
 }
 
 bool ConfigEvent::ParseReqForType(cgicc::Cgicc& cgi){
-	EventType *req = new EventType();
-	this->_req = req;
+  EventType *req = new EventType();
+  this->_req = req;
 
-	if (!cgi("id").empty()) req->set_id( atol(cgi("id").c_str()) );
-	if (!cgi("desc").empty()) req->set_desc( cgi("desc") );
+  if (!cgi("id").empty()) req->set_id( atol(cgi("id").c_str()) );
+  if (!cgi("desc").empty()) req->set_desc( cgi("desc") );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForUrlType(cgicc::Cgicc& cgi){
@@ -4290,152 +4301,152 @@ bool ConfigEvent::ParseReqForUrlType(cgicc::Cgicc& cgi){
 }
 
 bool ConfigEvent::ParseReqForConfigThreshold(cgicc::Cgicc& cgi){
-	EventConfig *req = new EventConfig();
-	this->_req = req;
+  EventConfig *req = new EventConfig();
+  this->_req = req;
 
-	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("moid").empty()) req->set_moid( atol(cgi("moid").c_str()) );
-	if (!cgi("thres_mode").empty()) req->set_thres_mode( boost::to_lower_copy(cgi("thres_mode")) );
-	if (!cgi("data_type").empty()) req->set_data_type( cgi("data_type") );
-	if (!cgi("min").empty()) req->set_min( cgi("min")=="null"?"":cgi("min") );
-	if (!cgi("max").empty()) req->set_max( cgi("max")=="null"?"":cgi("max") );
-	if (!cgi("grep_rule").empty()) req->set_grep_rule( cgi("grep_rule")=="null"?"":cgi("grep_rule") );
+  if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
+  if (!cgi("moid").empty()) req->set_moid( atol(cgi("moid").c_str()) );
+  if (!cgi("thres_mode").empty()) req->set_thres_mode( boost::to_lower_copy(cgi("thres_mode")) );
+  if (!cgi("data_type").empty()) req->set_data_type( cgi("data_type") );
+  if (!cgi("min").empty()) req->set_min( cgi("min")=="null"?"":cgi("min") );
+  if (!cgi("max").empty()) req->set_max( cgi("max")=="null"?"":cgi("max") );
+  if (!cgi("grep_rule").empty()) req->set_grep_rule( cgi("grep_rule")=="null"?"":cgi("grep_rule") );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForConfigBlack(cgicc::Cgicc& cgi){
-	EventConfig *req = new EventConfig();
-	this->_req = req;
+  EventConfig *req = new EventConfig();
+  this->_req = req;
 
-	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("data_type").empty()) req->set_data_type( cgi("data_type") );
-	if (!cgi("min").empty()) req->set_min( cgi("min") );
-	if (!cgi("max").empty()) req->set_max( cgi("max")=="null"?"":cgi("max") );
+  if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
+  if (!cgi("data_type").empty()) req->set_data_type( cgi("data_type") );
+  if (!cgi("min").empty()) req->set_min( cgi("min") );
+  if (!cgi("max").empty()) req->set_max( cgi("max")=="null"?"":cgi("max") );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForConfigSus(cgicc::Cgicc& cgi){
-	EventConfig *req = new EventConfig();
-	this->_req = req;
+  EventConfig *req = new EventConfig();
+  this->_req = req;
 
-	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("data_type").empty()) req->set_data_type( cgi("data_type") );
-	if (!cgi("min").empty()) req->set_min( cgi("min") );
-	if (!cgi("max").empty()) req->set_max( cgi("max")=="null"?"":cgi("max") );
+  if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
+  if (!cgi("data_type").empty()) req->set_data_type( cgi("data_type") );
+  if (!cgi("min").empty()) req->set_min( cgi("min") );
+  if (!cgi("max").empty()) req->set_max( cgi("max")=="null"?"":cgi("max") );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForConfigPortScan(cgicc::Cgicc& cgi){
-	EventConfig *req = new EventConfig();
-	this->_req = req;
+  EventConfig *req = new EventConfig();
+  this->_req = req;
 
-	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("min_peerips").empty()) req->set_min_peerips( atol(cgi("min_peerips").c_str()) );
-	if (!cgi("max_peerips").empty()) req->set_max_peerips( cgi("max_peerips")=="null"?"":cgi("max_peerips") );
-	if (!cgi("ip").empty()) req->set_ip( ipAddSuffix( cgi("ip")=="null"?"":cgi("ip") ));
-	if (!cgi("port").empty()) req->set_port( cgi("port")=="null"?"":cgi("port") );
-	if (!cgi("protocol").empty()) req->set_protocol( cgi("protocol")=="null"?"":boost::to_upper_copy(cgi("protocol")) );
+  if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
+  if (!cgi("min_peerips").empty()) req->set_min_peerips( atol(cgi("min_peerips").c_str()) );
+  if (!cgi("max_peerips").empty()) req->set_max_peerips( cgi("max_peerips")=="null"?"":cgi("max_peerips") );
+  if (!cgi("ip").empty()) req->set_ip( ipAddSuffix( cgi("ip")=="null"?"":cgi("ip") ));
+  if (!cgi("port").empty()) req->set_port( cgi("port")=="null"?"":cgi("port") );
+  if (!cgi("protocol").empty()) req->set_protocol( cgi("protocol")=="null"?"":boost::to_upper_copy(cgi("protocol")) );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForConfigIPScan(cgicc::Cgicc& cgi){
-	EventConfig *req = new EventConfig();
-	this->_req = req;
+  EventConfig *req = new EventConfig();
+  this->_req = req;
 
-	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("min_peerports").empty()) req->set_min_peerports( atol(cgi("min_peerports").c_str()) );
-	if (!cgi("max_peerports").empty()) req->set_max_peerports( cgi("max_peerports")=="null"?"":cgi("max_peerports") );
-	if (!cgi("sip").empty()) req->set_sip( ipAddSuffix( cgi("sip")=="null"?"":cgi("sip") ));
-	if (!cgi("dip").empty()) req->set_dip( ipAddSuffix( cgi("dip")=="null"?"":cgi("dip") ));
-	if (!cgi("protocol").empty()) req->set_protocol( cgi("protocol")=="null"?"":boost::to_upper_copy(cgi("protocol")) );
+  if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
+  if (!cgi("min_peerports").empty()) req->set_min_peerports( atol(cgi("min_peerports").c_str()) );
+  if (!cgi("max_peerports").empty()) req->set_max_peerports( cgi("max_peerports")=="null"?"":cgi("max_peerports") );
+  if (!cgi("sip").empty()) req->set_sip( ipAddSuffix( cgi("sip")=="null"?"":cgi("sip") ));
+  if (!cgi("dip").empty()) req->set_dip( ipAddSuffix( cgi("dip")=="null"?"":cgi("dip") ));
+  if (!cgi("protocol").empty()) req->set_protocol( cgi("protocol")=="null"?"":boost::to_upper_copy(cgi("protocol")) );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForConfigSrv(cgicc::Cgicc& cgi){
-	EventConfig *req = new EventConfig();
-	this->_req = req;
+  EventConfig *req = new EventConfig();
+  this->_req = req;
 
-	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("min_portsessions").empty()) req->set_min_portsessions( atol(cgi("min_portsessions").c_str()) );
-	if (!cgi("max_portsessions").empty()) req->set_max_portsessions( cgi("max_portsessions")=="null"?"":cgi("max_portsessions") );
-	if (!cgi("ip").empty()) req->set_ip( ipAddSuffix( cgi("ip")=="null"?"":cgi("ip") ));
-	if (!cgi("port").empty()) req->set_port( cgi("port")=="null"?"":cgi("port") );
-	if (!cgi("protocol").empty()) req->set_protocol( cgi("protocol")=="null"?"":boost::to_upper_copy(cgi("protocol")) );
+  if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
+  if (!cgi("min_portsessions").empty()) req->set_min_portsessions( atol(cgi("min_portsessions").c_str()) );
+  if (!cgi("max_portsessions").empty()) req->set_max_portsessions( cgi("max_portsessions")=="null"?"":cgi("max_portsessions") );
+  if (!cgi("ip").empty()) req->set_ip( ipAddSuffix( cgi("ip")=="null"?"":cgi("ip") ));
+  if (!cgi("port").empty()) req->set_port( cgi("port")=="null"?"":cgi("port") );
+  if (!cgi("protocol").empty()) req->set_protocol( cgi("protocol")=="null"?"":boost::to_upper_copy(cgi("protocol")) );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForLevel(cgicc::Cgicc& cgi){
-	EventLevel *req = new EventLevel();
-	this->_req = req;
+  EventLevel *req = new EventLevel();
+  this->_req = req;
 
-	if (!cgi("id").empty()) req->set_id( atol(cgi("id").c_str()) );
-	if (!cgi("desc").empty()) req->set_desc( cgi("desc") );
-	if (!cgi("profile").empty()) req->set_profile( cgi("profile")=="null"?"":cgi("profile") );
+  if (!cgi("id").empty()) req->set_id( atol(cgi("id").c_str()) );
+  if (!cgi("desc").empty()) req->set_desc( cgi("desc") );
+  if (!cgi("profile").empty()) req->set_profile( cgi("profile")=="null"?"":cgi("profile") );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForAction(cgicc::Cgicc& cgi){
-	EventAction *req = new EventAction();
-	this->_req = req;
+  EventAction *req = new EventAction();
+  this->_req = req;
 
-	if (!cgi("action_id").empty()) req->set_action_id( atol(cgi("action_id").c_str()) );
-	if (!cgi("act").empty()) req->set_act( atol(cgi("act").c_str()) );
-	if (!cgi("mail").empty()) req->set_mail( cgi("mail")=="null"?"":cgi("mail") );
-	if (!cgi("phone").empty()) req->set_phone( cgi("phone")=="null"?"":cgi("phone") );
-	if (!cgi("uid").empty()) req->set_uid( cgi("uid")=="null"?"":cgi("uid") );
-	if (!cgi("desc").empty()) req->set_desc( cgi("desc")=="null"?"":cgi("desc") );
+  if (!cgi("action_id").empty()) req->set_action_id( atol(cgi("action_id").c_str()) );
+  if (!cgi("act").empty()) req->set_act( atol(cgi("act").c_str()) );
+  if (!cgi("mail").empty()) req->set_mail( cgi("mail")=="null"?"":cgi("mail") );
+  if (!cgi("phone").empty()) req->set_phone( cgi("phone")=="null"?"":cgi("phone") );
+  if (!cgi("uid").empty()) req->set_uid( cgi("uid")=="null"?"":cgi("uid") );
+  if (!cgi("desc").empty()) req->set_desc( cgi("desc")=="null"?"":cgi("desc") );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForDataAggre(cgicc::Cgicc& cgi){
-	EventDataAggre *req = new EventDataAggre();
-	this->_req = req;
+  EventDataAggre *req = new EventDataAggre();
+  this->_req = req;
 
-	if (!cgi("starttime").empty()) req->set_starttime(atoll(cgi("starttime").c_str()));
-	if (!cgi("endtime").empty()) req->set_endtime(atoll(cgi("endtime").c_str()));
-	if (!cgi("step").empty()) req->set_step(atol(cgi("step").c_str()));
-	if (!cgi("event_type").empty()) req->set_type(cgi("event_type"));
-	if (!cgi("devid").empty()) req->set_devid(atol(cgi("devid").c_str()));
-	if (!cgi("event_id").empty()) req->set_event_id(atol(cgi("event_id").c_str()));
-	if (!cgi("id").empty()) req->set_id(atol(cgi("id").c_str()));
-	if (!cgi("obj").empty()) req->set_obj(cgi("obj"));
-	if (!cgi("level").empty()) req->set_level(cgi("level"));
+  if (!cgi("starttime").empty()) req->set_starttime(atoll(cgi("starttime").c_str()));
+  if (!cgi("endtime").empty()) req->set_endtime(atoll(cgi("endtime").c_str()));
+  if (!cgi("step").empty()) req->set_step(atol(cgi("step").c_str()));
+  if (!cgi("event_type").empty()) req->set_type(cgi("event_type"));
+  if (!cgi("devid").empty()) req->set_devid(atol(cgi("devid").c_str()));
+  if (!cgi("event_id").empty()) req->set_event_id(atol(cgi("event_id").c_str()));
+  if (!cgi("id").empty()) req->set_id(atol(cgi("id").c_str()));
+  if (!cgi("obj").empty()) req->set_obj(cgi("obj"));
+  if (!cgi("level").empty()) req->set_level(cgi("level"));
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForConfigDga(cgicc::Cgicc& cgi){
-	EventConfig *req = new EventConfig();
-	this->_req = req;
+  EventConfig *req = new EventConfig();
+  this->_req = req;
 
-	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("sip").empty()) req->set_sip( cgi("sip")=="null"?"":cgi("sip") );
-	if (!cgi("dip").empty()) req->set_dip( cgi("dip")=="null"?"":cgi("dip") );
-	if (!cgi("min").empty()) req->set_min( cgi("min")=="null"?"":cgi("min") );
+  if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
+  if (!cgi("sip").empty()) req->set_sip( cgi("sip")=="null"?"":cgi("sip") );
+  if (!cgi("dip").empty()) req->set_dip( cgi("dip")=="null"?"":cgi("dip") );
+  if (!cgi("min").empty()) req->set_min( cgi("min")=="null"?"":cgi("min") );
   if (!cgi("qcount").empty()) req->set_qcount( atol(cgi("qcount").c_str()) );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForConfigDns(cgicc::Cgicc& cgi){
-	EventConfig *req = new EventConfig();
-	this->_req = req;
+  EventConfig *req = new EventConfig();
+  this->_req = req;
 
-	if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
-	if (!cgi("ip").empty()) req->set_ip( cgi("ip")=="null"?"":cgi("ip") );
-	if (!cgi("qname").empty()) req->set_qname( cgi("qname")=="null"?"":cgi("qname") );
-	if (!cgi("qcount").empty()) req->set_qcount( atol(cgi("qcount").c_str()) );
+  if (!cgi("config_id").empty()) req->set_id( atol(cgi("config_id").c_str()) );
+  if (!cgi("ip").empty()) req->set_ip( cgi("ip")=="null"?"":cgi("ip") );
+  if (!cgi("qname").empty()) req->set_qname( cgi("qname")=="null"?"":cgi("qname") );
+  if (!cgi("qcount").empty()) req->set_qcount( atol(cgi("qcount").c_str()) );
   if (!cgi("desc").empty()) req->set_desc( cgi("desc")=="null"?"":cgi("desc") );
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ParseReqForConfigDnstunnel(cgicc::Cgicc& cgi){
@@ -4509,110 +4520,110 @@ bool ConfigEvent::ParseReqForConfigDnstunAI(cgicc::Cgicc& cgi) {
 }
 
 bool ConfigEvent::ValidateEvent(){
-	Event *req = (Event *)this->_req;
+  Event *req = (Event *)this->_req;
 
-	switch (_op){
-		case ADD:
-			if ( !req->has_desc() || !req->has_event_type() || !req->has_event_level() || !req->has_status() || !req->has_action_id() || !req->has_config_id() )
-				return Failed();
-			if (req->status()!="ON" && req->status()!="OFF")
-				return Failed();
+  switch (_op){
+    case ADD:
+      if ( !req->has_desc() || !req->has_event_type() || !req->has_event_level() || !req->has_status() || !req->has_action_id() || !req->has_config_id() )
+        return Failed();
+      if (req->status()!="ON" && req->status()!="OFF")
+        return Failed();
 
-			if (!req->has_coverrange())
-				req->set_coverrange("within");
-			if (req->coverrange()!="within" && req->coverrange()!="without")
-				return Failed();
+      if (!req->has_coverrange())
+        req->set_coverrange("within");
+      if (req->coverrange()!="within" && req->coverrange()!="without")
+        return Failed();
 
-			if (req->has_weekday() && req->weekday().empty())
-				req->set_weekday("0,1,2,3,4,5,6");
+      if (req->has_weekday() && req->weekday().empty())
+        req->set_weekday("0,1,2,3,4,5,6");
 
-			if (!req->has_stime()) req->set_stime("00:00:00");
-			if (!req->has_etime()) req->set_etime("23:59:59");
+      if (!req->has_stime()) req->set_stime("00:00:00");
+      if (!req->has_etime()) req->set_etime("23:59:59");
 
-			try{
-				u32 id;
-				cppdb::result r;
-				if (req->has_event_type()){
-					r = *_sql << "SELECT `id` FROM `t_event_type` WHERE `desc` = ?"<<req->event_type();
-					r.next();
-					r>>id;
-					req->set_type_id(id);
-				}
+      try{
+        u32 id;
+        cppdb::result r;
+        if (req->has_event_type()){
+          r = *_sql << "SELECT `id` FROM `t_event_type` WHERE `desc` = ?"<<req->event_type();
+          r.next();
+          r>>id;
+          req->set_type_id(id);
+        }
 
-				if (req->has_event_level()){
-					r = *_sql << "SELECT `id` FROM `t_event_level` WHERE `desc` = ?"<<req->event_level();
-					r.next();
-					r>>id;
-					req->set_level_id(id);
-				}
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
-			break;
-		case DEL:
-			if ( !req->has_event_id() )
-				return Failed();
-			try{
-				u32 id;
-				cppdb::result r;
+        if (req->has_event_level()){
+          r = *_sql << "SELECT `id` FROM `t_event_level` WHERE `desc` = ?"<<req->event_level();
+          r.next();
+          r>>id;
+          req->set_level_id(id);
+        }
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
+      break;
+    case DEL:
+      if ( !req->has_event_id() )
+        return Failed();
+      try{
+        u32 id;
+        cppdb::result r;
 
-				r = *_sql << "SELECT `status_id` FROM `t_event_list` WHERE `id`=?"<<req->event_id();
-				r.next();
-				r>>id;
-				req->set_status_id(id);
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("%s", e.what());
-				return Failed();
-			}
-			break;
-		case MOD:
-			if ( !req->has_event_id() )
-				return Failed();
-			if ( !req->has_desc() && !req->has_event_type() && !req->has_event_level() && !req->has_status() && !req->has_action_id() && !req->has_config_id() && !req->has_devid() && !req->has_moid() && !req->has_weekday() && !req->has_stime() && !req->has_etime() && !req->has_coverrange() )
-				return Failed();
-			if (req->has_status() && req->status()!="ON" && req->status()!="OFF")
-				return Failed();
-			if (req->has_coverrange() && req->coverrange()!="within" && req->coverrange()!="without")
-				return Failed();
-			if (req->has_weekday() && req->weekday().empty())
-				req->set_weekday("0,1,2,3,4,5,6");
+        r = *_sql << "SELECT `status_id` FROM `t_event_list` WHERE `id`=?"<<req->event_id();
+        r.next();
+        r>>id;
+        req->set_status_id(id);
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("%s", e.what());
+        return Failed();
+      }
+      break;
+    case MOD:
+      if ( !req->has_event_id() )
+        return Failed();
+      if ( !req->has_desc() && !req->has_event_type() && !req->has_event_level() && !req->has_status() && !req->has_action_id() && !req->has_config_id() && !req->has_devid() && !req->has_moid() && !req->has_weekday() && !req->has_stime() && !req->has_etime() && !req->has_coverrange() )
+        return Failed();
+      if (req->has_status() && req->status()!="ON" && req->status()!="OFF")
+        return Failed();
+      if (req->has_coverrange() && req->coverrange()!="within" && req->coverrange()!="without")
+        return Failed();
+      if (req->has_weekday() && req->weekday().empty())
+        req->set_weekday("0,1,2,3,4,5,6");
 
-			try{
-				u32 id;
-				cppdb::result r;
+      try{
+        u32 id;
+        cppdb::result r;
 
-				r = *_sql << "SELECT `status_id` FROM `t_event_list` WHERE `id`=?"<<req->event_id();
-				r.next();
-				r>>id;
-				req->set_status_id(id);
+        r = *_sql << "SELECT `status_id` FROM `t_event_list` WHERE `id`=?"<<req->event_id();
+        r.next();
+        r>>id;
+        req->set_status_id(id);
 
-				if (req->has_event_type()){
-					r = *_sql << "SELECT `id` FROM `t_event_type` WHERE `desc` = ?"<<req->event_type();
-					r.next();
-					r>>id;
-					req->set_type_id(id);
-				}
+        if (req->has_event_type()){
+          r = *_sql << "SELECT `id` FROM `t_event_type` WHERE `desc` = ?"<<req->event_type();
+          r.next();
+          r>>id;
+          req->set_type_id(id);
+        }
 
-				if (req->has_event_level()){
-					r = *_sql << "SELECT `id` FROM `t_event_level` WHERE `desc` = ?"<<req->event_level();
-					r.next();
-					r>>id;
-					req->set_level_id(id);
-				}
-			} catch ( cppdb::cppdb_error const &e ){
-				log_err("event_list: mod: %s", e.what());
-				return Failed();
-			}
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+        if (req->has_event_level()){
+          r = *_sql << "SELECT `id` FROM `t_event_level` WHERE `desc` = ?"<<req->event_level();
+          r.next();
+          r>>id;
+          req->set_level_id(id);
+        }
+      } catch ( cppdb::cppdb_error const &e ){
+        log_err("event_list: mod: %s", e.what());
+        return Failed();
+      }
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateUrlType(){
@@ -4636,357 +4647,357 @@ bool ConfigEvent::ValidateUrlType(){
 }
 
 bool ConfigEvent::ValidateType(){
-	switch (_op){
-		case ADD:
-			return Failed();
-			break;
-		case DEL:
-			return Failed();
-			break;
-		case MOD:
-			return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+  switch (_op){
+    case ADD:
+      return Failed();
+      break;
+    case DEL:
+      return Failed();
+      break;
+    case MOD:
+      return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateConfigThreshold(){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:
-			if ( req->thres_mode().empty() || req->data_type().empty() )
-				return Failed();
-			if ( !req->has_min() && !req->has_max())
-				return Failed();
-			if ( req->thres_mode()!="abs" && req->thres_mode()!="rel_v" && req->thres_mode()!="rel_p" )
-				return Failed();
-			if ( req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
-				return Failed();
-			if ( !req->has_moid() )
-				req->set_moid(0);
-			break;
-		case DEL:
-			if ( !req->has_id() )
-				return Failed();
-			break;
-		case MOD:
-			if ( !req->has_id() )
-				return Failed();
-			if ( !req->has_moid() && req->thres_mode().empty() && req->data_type().empty() && !req->has_grep_rule() && !req->has_min() && !req->has_max() )
-				return Failed();
-			if ( req->has_thres_mode() && req->thres_mode()!="abs" && req->thres_mode()!="rel_v" && req->thres_mode()!="rel_p" )
-				return Failed();
-			if ( req->has_data_type() && req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
-				return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+  switch (_op){
+    case ADD:
+      if ( req->thres_mode().empty() || req->data_type().empty() )
+        return Failed();
+      if ( !req->has_min() && !req->has_max())
+        return Failed();
+      if ( req->thres_mode()!="abs" && req->thres_mode()!="rel_v" && req->thres_mode()!="rel_p" )
+        return Failed();
+      if ( req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
+        return Failed();
+      if ( !req->has_moid() )
+        req->set_moid(0);
+      break;
+    case DEL:
+      if ( !req->has_id() )
+        return Failed();
+      break;
+    case MOD:
+      if ( !req->has_id() )
+        return Failed();
+      if ( !req->has_moid() && req->thres_mode().empty() && req->data_type().empty() && !req->has_grep_rule() && !req->has_min() && !req->has_max() )
+        return Failed();
+      if ( req->has_thres_mode() && req->thres_mode()!="abs" && req->thres_mode()!="rel_v" && req->thres_mode()!="rel_p" )
+        return Failed();
+      if ( req->has_data_type() && req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
+        return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateConfigPortScan(){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:
-			if ( !req->has_min_peerips() )
-				return Failed();
-			if ( req->port()!="" && !is_valid_port(req->port()) )
-				return Failed();
-			break;
-		case DEL:
-			if ( !req->has_id() )
-				return Failed();
-			break;
-		case MOD:
-			if ( !req->has_id() )
-				return Failed();
-			if ( !req->has_min_peerips() && !req->has_max_peerips() && !req->has_ip() && !req->has_port() && !req->has_protocol() )
-				return Failed();
-			if ( req->ip()!="" && !is_valid_cidr(req->ip()) )
-				return Failed();
-			if ( req->port()!="" && !is_valid_port(req->port()) )
-				return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+  switch (_op){
+    case ADD:
+      if ( !req->has_min_peerips() )
+        return Failed();
+      if ( req->port()!="" && !is_valid_port(req->port()) )
+        return Failed();
+      break;
+    case DEL:
+      if ( !req->has_id() )
+        return Failed();
+      break;
+    case MOD:
+      if ( !req->has_id() )
+        return Failed();
+      if ( !req->has_min_peerips() && !req->has_max_peerips() && !req->has_ip() && !req->has_port() && !req->has_protocol() )
+        return Failed();
+      if ( req->ip()!="" && !is_valid_cidr(req->ip()) )
+        return Failed();
+      if ( req->port()!="" && !is_valid_port(req->port()) )
+        return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateConfigIPScan(){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:
-			if ( !req->has_min_peerports() )
-				return Failed();
-			if ( req->dip()!="" && !is_valid_cidr(req->dip()) )
-				return Failed();
-			break;
-		case DEL:
-			if ( !req->has_id() )
-				return Failed();
-			break;
-		case MOD:
-			if ( !req->has_id() )
-				return Failed();
-			if ( !req->has_min_peerports() && !req->has_max_peerports() && !req->has_sip() && !req->has_dip() && !req->has_protocol() )
-				return Failed();
-			if ( req->sip()!="" && !is_valid_cidr(req->sip()) )
-				return Failed();
-			if ( req->dip()!="" && !is_valid_cidr(req->dip()) )
-				return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+  switch (_op){
+    case ADD:
+      if ( !req->has_min_peerports() )
+        return Failed();
+      if ( req->dip()!="" && !is_valid_cidr(req->dip()) )
+        return Failed();
+      break;
+    case DEL:
+      if ( !req->has_id() )
+        return Failed();
+      break;
+    case MOD:
+      if ( !req->has_id() )
+        return Failed();
+      if ( !req->has_min_peerports() && !req->has_max_peerports() && !req->has_sip() && !req->has_dip() && !req->has_protocol() )
+        return Failed();
+      if ( req->sip()!="" && !is_valid_cidr(req->sip()) )
+        return Failed();
+      if ( req->dip()!="" && !is_valid_cidr(req->dip()) )
+        return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateConfigSrv(){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:
-			if ( !req->has_min_portsessions() )
-				return Failed();
-			if ( req->ip()!="" && !is_valid_cidr(req->ip()) )
-				return Failed();
-			break;
-		case DEL:
-			if ( !req->has_id() )
-				return Failed();
-			break;
-		case MOD:
-			if ( !req->has_id() )
-				return Failed();
-			if ( !req->has_min_portsessions() && !req->has_max_portsessions() && !req->has_ip() && !req->has_port() && !req->has_protocol() )
-				return Failed();
-			if ( req->ip()!="" && !is_valid_cidr(req->ip()) )
-				return Failed();
-			if ( req->port()!="" && !is_valid_port(req->port()) )
-				return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+  switch (_op){
+    case ADD:
+      if ( !req->has_min_portsessions() )
+        return Failed();
+      if ( req->ip()!="" && !is_valid_cidr(req->ip()) )
+        return Failed();
+      break;
+    case DEL:
+      if ( !req->has_id() )
+        return Failed();
+      break;
+    case MOD:
+      if ( !req->has_id() )
+        return Failed();
+      if ( !req->has_min_portsessions() && !req->has_max_portsessions() && !req->has_ip() && !req->has_port() && !req->has_protocol() )
+        return Failed();
+      if ( req->ip()!="" && !is_valid_cidr(req->ip()) )
+        return Failed();
+      if ( req->port()!="" && !is_valid_port(req->port()) )
+        return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateConfigBlack(){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:
+  switch (_op){
+    case ADD:
       if ( req->data_type().empty() )
         return Failed();
-			if ( req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
-				return Failed();
-			if ( !req->has_min() )
-				return Failed();
-			break;
-		case DEL:
-			if ( !req->has_id() )
-				return Failed();
-			break;
-		case MOD:
-			if ( !req->has_id() )
-				return Failed();
-			if ( !req->has_min() && !req->has_max() && req->data_type().empty() ) 
-				return Failed();
+      if ( req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
+        return Failed();
+      if ( !req->has_min() )
+        return Failed();
+      break;
+    case DEL:
+      if ( !req->has_id() )
+        return Failed();
+      break;
+    case MOD:
+      if ( !req->has_id() )
+        return Failed();
+      if ( !req->has_min() && !req->has_max() && req->data_type().empty() ) 
+        return Failed();
       if ( req->has_data_type() && req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
         return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateConfigSus(){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:
+  switch (_op){
+    case ADD:
       if ( req->data_type().empty() )
         return Failed();
-			if ( req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
-				return Failed();
-			if ( !req->has_min() )
-				return Failed();
-			break;
-		case DEL:
-			if ( !req->has_id() )
-				return Failed();
-			break;
-		case MOD:
-			if ( !req->has_id() )
-				return Failed();
-			if ( !req->has_min() && !req->has_max() && req->data_type().empty() ) 
-				return Failed();
+      if ( req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
+        return Failed();
+      if ( !req->has_min() )
+        return Failed();
+      break;
+    case DEL:
+      if ( !req->has_id() )
+        return Failed();
+      break;
+    case MOD:
+      if ( !req->has_id() )
+        return Failed();
+      if ( !req->has_min() && !req->has_max() && req->data_type().empty() ) 
+        return Failed();
       if ( req->has_data_type() && req->data_type()!="Bps" && req->data_type()!="pps" && req->data_type()!="fps" )
         return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 
 bool ConfigEvent::ValidateLevel(){
-	switch (_op){
-		case ADD:
-			return Failed();
-			break;
-		case DEL:
-			return Failed();
-			break;
-		case MOD:
-			return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+  switch (_op){
+    case ADD:
+      return Failed();
+      break;
+    case DEL:
+      return Failed();
+      break;
+    case MOD:
+      return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateAction(){
-	EventAction *req = (EventAction *)this->_req;
-	u32 act = req->act();
+  EventAction *req = (EventAction *)this->_req;
+  u32 act = req->act();
 
-	switch (_op){
-		case ADD:
-			if (req->desc().empty())
-				return Failed();
-			if ( act==0 || act>0x7 )
-				return Failed();
-			if ( act&0x1 && req->mail().empty() )
-				return Failed();
-			if ( act&0x2 && req->phone().empty() )
-				return Failed();
-			if ( act&0x4 && req->uid().empty() )
-				return Failed();
-			break;
-		case DEL:
-			if ( !req->has_action_id() )
-				return Failed();
-			break;
-		case MOD:
-			if ( !req->has_action_id() )
-				return Failed();
-			if ( act>0x7 )
-				return Failed();
-			if ( act&0x1 && req->mail().empty() )
-				return Failed();
-			if ( act&0x2 && req->phone().empty() )
-				return Failed();
-			if ( act&0x4 && req->uid().empty() )
-				return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+  switch (_op){
+    case ADD:
+      if (req->desc().empty())
+        return Failed();
+      if ( act==0 || act>0x7 )
+        return Failed();
+      if ( act&0x1 && req->mail().empty() )
+        return Failed();
+      if ( act&0x2 && req->phone().empty() )
+        return Failed();
+      if ( act&0x4 && req->uid().empty() )
+        return Failed();
+      break;
+    case DEL:
+      if ( !req->has_action_id() )
+        return Failed();
+      break;
+    case MOD:
+      if ( !req->has_action_id() )
+        return Failed();
+      if ( act>0x7 )
+        return Failed();
+      if ( act&0x1 && req->mail().empty() )
+        return Failed();
+      if ( act&0x2 && req->phone().empty() )
+        return Failed();
+      if ( act&0x4 && req->uid().empty() )
+        return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateConfigAll(){
-	switch (_op){
-		case ADD:
-			return Failed();
-			break;
-		case DEL:
-			return Failed();
-			break;
-		case MOD:
-			return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+  switch (_op){
+    case ADD:
+      return Failed();
+      break;
+    case DEL:
+      return Failed();
+      break;
+    case MOD:
+      return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateDataAggre(){
-	EventDataAggre *req = (EventDataAggre *)this->_req;
+  EventDataAggre *req = (EventDataAggre *)this->_req;
 
-	switch (_op){
-		case ADD:
-			return Failed();
-			break;
-		case DEL:
-			return Failed();
-			break;
-		case MOD:
-			return Failed();
-			break;
-		case GET:{
-			u32 ts = time(NULL);
+  switch (_op){
+    case ADD:
+      return Failed();
+      break;
+    case DEL:
+      return Failed();
+      break;
+    case MOD:
+      return Failed();
+      break;
+    case GET:{
+      u32 ts = time(NULL);
 
-			if (!req->has_starttime())
-			  req->set_starttime( ts - 1800 );
-			if (!req->has_endtime())
-			  req->set_endtime( ts );
-			req->set_starttime(req->starttime() - req->starttime()%300);
-			req->set_endtime(req->endtime() - req->endtime()%300);
-			req->set_endtime(MAX(req->starttime()+300, req->endtime()));
-			if (req->has_step()){
-			  req->set_step(req->step() - req->step()%300);
-			  req->set_step(MAX(req->step(), 300));
-			}
-			break;
-		}
-		default:
-			return false; // This code should never execute
-			break;
-	}
+      if (!req->has_starttime())
+        req->set_starttime( ts - 1800 );
+      if (!req->has_endtime())
+        req->set_endtime( ts );
+      req->set_starttime(req->starttime() - req->starttime()%300);
+      req->set_endtime(req->endtime() - req->endtime()%300);
+      req->set_endtime(MAX(req->starttime()+300, req->endtime()));
+      if (req->has_step()){
+        req->set_step(req->step() - req->step()%300);
+        req->set_step(MAX(req->step(), 300));
+      }
+      break;
+    }
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateEventIgnore() {
@@ -5059,60 +5070,60 @@ bool ConfigEvent::ValidateEventIgnore() {
 }
 
 bool ConfigEvent::ValidateConfigDga(){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:
-			if ( !req->has_sip() && !req->has_dip() && !req->has_qcount() && !req->has_min() )
-				return Failed();
-			break;
-		case DEL:
-			if ( !req->has_id() )
-				return Failed();
-			break;
-		case MOD:
-			if ( !req->has_id() )
-				return Failed();
-			if ( !req->has_sip() && !req->has_dip() && !req->has_qcount() && !req->has_min())
-				return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+  switch (_op){
+    case ADD:
+      if ( !req->has_sip() && !req->has_dip() && !req->has_qcount() && !req->has_min() )
+        return Failed();
+      break;
+    case DEL:
+      if ( !req->has_id() )
+        return Failed();
+      break;
+    case MOD:
+      if ( !req->has_id() )
+        return Failed();
+      if ( !req->has_sip() && !req->has_dip() && !req->has_qcount() && !req->has_min())
+        return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 bool ConfigEvent::ValidateConfigDns(){
-	EventConfig *req = (EventConfig *)this->_req;
+  EventConfig *req = (EventConfig *)this->_req;
 
-	switch (_op){
-		case ADD:
-			if ( !req->has_ip() && !req->has_qname() && !req->qcount() && !req->has_desc() )
-				return Failed();
+  switch (_op){
+    case ADD:
+      if ( !req->has_ip() && !req->has_qname() && !req->qcount() && !req->has_desc() )
+        return Failed();
       if (!req->has_qcount())
         req->set_qcount(0);
-			break;
-		case DEL:
-			if ( !req->has_id() )
-				return Failed();
-			break;
-		case MOD:
-			if ( !req->has_id() )
-				return Failed();
-			if ( !req->has_ip() && !req->has_qname() && !req->has_qcount() && !req->has_desc())
-				return Failed();
-			break;
-		case GET:
-			break;
-		default:
-			return false; // This code should never execute
-			break;
-	}
+      break;
+    case DEL:
+      if ( !req->has_id() )
+        return Failed();
+      break;
+    case MOD:
+      if ( !req->has_id() )
+        return Failed();
+      if ( !req->has_ip() && !req->has_qname() && !req->has_qcount() && !req->has_desc())
+        return Failed();
+      break;
+    case GET:
+      break;
+    default:
+      return false; // This code should never execute
+      break;
+  }
 
-	return true;
+  return true;
 }
 
 bool ConfigEvent::ValidateConfigDnstunnel(){
