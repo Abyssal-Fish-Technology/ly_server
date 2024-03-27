@@ -2,7 +2,7 @@
 #include "../common/log.h"
 #include "define.h"
 #include <Cgicc.h>
-#include "../common/strings.h"
+#include "../common/_strings.h"
 #include "../common/csv.hpp"
 #include <map>
 #include <string>

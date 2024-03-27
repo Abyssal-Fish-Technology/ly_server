@@ -2,7 +2,7 @@
 #include "../common.h"
 #include "../file.h"
 #include "../log.h"
-#include "../strings.h"
+#include "../_strings.h"
 #include <iostream>
 #include <sstream>
 #include <google/protobuf/io/zero_copy_stream.h>

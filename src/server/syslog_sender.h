@@ -2,7 +2,7 @@
 #define __SYSLOG_H__
 
 #include "../common/log.h"
-#include "../common/strings.h"
+#include "../common/_strings.h"
 #include "define.h"
 
 using namespace std;

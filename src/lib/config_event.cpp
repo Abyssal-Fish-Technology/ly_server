@@ -2,7 +2,7 @@
 #include <boost/algorithm/string.hpp>
 #include "../common/common.h"
 #include "../common/log.h"
-#include "../common/strings.h"
+#include "../common/_strings.h"
 #include "../common/ip.h"
 #include "../common/csv.hpp"
 #include "boost/regex.hpp"

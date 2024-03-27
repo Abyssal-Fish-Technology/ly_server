@@ -1,6 +1,6 @@
 #include "common.h"
 #include "ini.h"
-#include "strings.h"
+#include "_strings.h"
 #include "log.h"
 
 using namespace std;

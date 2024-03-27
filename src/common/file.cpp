@@ -1,6 +1,6 @@
 #include "file.h"
 #include "log.h"
-#include "strings.h"
+#include "_strings.h"
 
 using namespace std;
 

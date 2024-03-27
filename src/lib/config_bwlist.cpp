@@ -2,7 +2,7 @@
 #include <boost/algorithm/string.hpp>
 #include "../common/common.h"
 #include "../common/log.h"
-#include "../common/strings.h"
+#include "../common/_strings.h"
 
 using namespace std;
 using namespace config_req;

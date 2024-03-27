@@ -3,7 +3,7 @@
 #include "../common/log.h"
 #include "../common/ip.h"
 #include "../common/http.h"
-#include "../common/strings.h"
+#include "../common/_strings.h"
 #include "../common/event.pb.h"
 #include "../common/event_req.h"
 #include "../common/csv.hpp"

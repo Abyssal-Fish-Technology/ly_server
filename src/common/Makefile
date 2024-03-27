@@ -10,7 +10,7 @@ LDFLAGS=-shared -Wl,--whole-archive -lprotobuf -lcppdb -lcgicc -lcurl -lboost_re
 
 SUBDIRS=baseline
 TARGETS=common libcommon.so
-SRCS=strings.cpp log.cpp ip.cpp datetime.cpp topn_req.cpp sha256.cpp http.cpp file.cpp ini.cpp config.cpp mo_req.cpp md5.cpp cJSON.cpp slice.cpp stringutil.cpp scoped_mmap.cpp mmapped_file.cpp event_req.cpp feature_req.cpp topn_param.cpp CMyINI.cpp asset.cpp ctl_req.cpp event_feature_req.cpp
+SRCS=_strings.cpp log.cpp ip.cpp datetime.cpp topn_req.cpp sha256.cpp http.cpp file.cpp ini.cpp config.cpp mo_req.cpp md5.cpp cJSON.cpp slice.cpp stringutil.cpp scoped_mmap.cpp mmapped_file.cpp event_req.cpp feature_req.cpp topn_param.cpp CMyINI.cpp asset.cpp ctl_req.cpp event_feature_req.cpp
 SRCS+=tic.cpp
 SRCS+=evidence_req.cpp 
 HDRS=$(SRCS:.cpp=.h)
