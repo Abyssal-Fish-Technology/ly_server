@@ -557,8 +557,10 @@ static int process(cgicc::Cgicc& cgi, HTTPContentHeader& header) {
 int main(int argc, char *argv[]) {
 	sql = start_db_session();
 	is_http = getenv("REMOTE_ADDR") != NULL;
-  string api = getenv("SCRIPT_NAME");  //防止命令注入
-  if (api != "/d/auth") return 0;
+	const char *c_api = getenv("SCRIPT_NAME");  //防止命令注入
+	if (!c_api) return 0;
+	string api = c_api;
+	if (api != "/d/auth") return 0;
 
 	if (is_http) {
 		cgicc::Cgicc cgi;
