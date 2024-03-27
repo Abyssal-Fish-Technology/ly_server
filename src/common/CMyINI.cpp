@@ -1,5 +1,5 @@
 #include "CMyINI.h"
-#include "strings.h"
+#include "_strings.h"
 
 #define INIDEBUG
 

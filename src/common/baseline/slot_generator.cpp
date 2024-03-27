@@ -2,7 +2,7 @@
 #include "../common.h"
 #include "../file.h"
 #include "../config.h"
-#include "../strings.h"
+#include "../_strings.h"
 #include "slot_manager.h"
 
 using namespace std;

@@ -1,5 +1,5 @@
 #include "asset.h"
-#include "strings.h"
+#include "_strings.h"
 #include "log.h"
 
 void LoadAssetFromFile(const string& file_name, std::unordered_set<string>* ips) {
