@@ -4,7 +4,7 @@
 #include "define.h"
 #include <cppdb/frontend.h>
 #include <string>
-#include "../common/strings.h"
+#include "../common/_strings.h"
 
 using namespace cppdb;
 using namespace std;
